@@ -15,6 +15,8 @@ A method to build a portable and offline-available MSD Manual.
 
 （其亦有行为请求`https://mmcdnprdcontent.azureedge.net/MSDZHProfessionalImages.zip`，但根据验证，此文件内容已包含在前述请求中，不具备研究价值。）
 
+请运行`getZip.py`获取并解压资源文件。
+
 ## `MSDZHProfessionalMedicalTopics.zip`的文件结构
 （仅保留对分析有价值的条目）
 ```tree
@@ -113,6 +115,8 @@ A method to build a portable and offline-available MSD Manual.
 
 ### `Section-Chapter`
 根据前述内容，通过`sections.json`和`allchapterstopics.json`我们可以完整获取`Section-Chapter`信息。
+
+运行`Section-Chapter.py`解析并生成HTML目录。
 
 ### `Section-Chapter-Topic`
 TODO
