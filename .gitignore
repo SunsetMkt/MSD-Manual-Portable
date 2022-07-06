@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# MSDZHProfessionalMedicalTopics.zip and unzipped files
+MSDZHProfessionalMedicalTopics/
+MSDZHProfessionalMedicalTopics.zip
