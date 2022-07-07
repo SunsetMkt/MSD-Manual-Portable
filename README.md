@@ -5,6 +5,12 @@ A method to build a portable and offline-available MSD Manual.
 
 在这里，我们以 *默沙东诊疗手册（医学专业人士版）* 为例。
 
+## Quick Start
+```shell
+$ pip3 install -r requirements.txt
+$ python3 start.py
+```
+
 ## 关于《默沙东诊疗手册》
 > 1899 年首次作为医生和药剂师的小型参考书出版，本手册的内容和范围日益增长，成为专业医护人员和消费者使用最广泛的综合性医学资源之一。 随着本手册的发展，它不断扩充内容的广度和深度以反映其使命，即向各界用户，包括医学从业人员和医学学生、兽医和兽医学生以及消费者，提供当下最好的医学信息。
 
@@ -16,6 +22,18 @@ A method to build a portable and offline-available MSD Manual.
 （其亦有行为请求`https://mmcdnprdcontent.azureedge.net/MSDZHProfessionalImages.zip`，但根据验证，此文件内容已包含在前述请求中，不具备研究价值。）
 
 请自行下载并解压缩`MSDZHProfessionalMedicalTopics.zip`至`MSDZHProfessionalMedicalTopics`目录。
+
+在文档撰写时，文件校验和信息如下：
+
+```
+名称: MSDZHProfessionalMedicalTopics.zip
+大小: 163803563 字节 (156 MiB)
+CRC32: C97C55A5
+CRC64: 15D20E4F37A0B579
+SHA256: 2b0662f46a65c54381f0998247ef7f6a592322e82457352876da869b7c7920c5
+SHA1: eb8333c36fa09b95b4da2388ef6564d0f1096de8
+BLAKE2sp: d0de7b61c3b50721c5afead245077153a3559f36f152d8148b9f7fe278b5912d
+```
 
 ## `MSDZHProfessionalMedicalTopics.zip`的文件结构
 （仅保留对分析有价值的条目）
@@ -69,7 +87,7 @@ A method to build a portable and offline-available MSD Manual.
 ## 快速开始
 下载并解压缩`MSDZHProfessionalMedicalTopics.zip`至`MSDZHProfessionalMedicalTopics`目录，将`HTML`文件夹中文件全部置入`MSDZHProfessionalMedicalTopics`目录，在`MSDZHProfessionalMedicalTopics`目录启动HTTP服务器，即可访问手册。
 
-这些步骤可以通过运行`start.py`自动完成。
+这些步骤可以通过运行`start.py`自动完成，在第一次成功启动后不再需要互联网连接。
 
 无需理会浏览器控制台提示错误和HTTP服务器显示的任何404错误，这些错误由手册资源文件自身造成且不会影响手册的正常显示。
 
