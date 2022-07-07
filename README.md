@@ -59,6 +59,8 @@ A method to build a portable and offline-available MSD Manual.
 ### `Section-Chapter-Topic`
 根据前述内容，通过`sections.json`和`{Section的UUID}.json`我们可以完整获取`Section-Chapter-Topic`对应信息。
 
+具体实现见`HTML/menu.html`，将其置入`MSDZHProfessionalMedicalTopics`目录下即可。
+
 ### 搜索
 通过分析`searchcontent.json`文件，我们可以获取到所有的搜索内容。
 
