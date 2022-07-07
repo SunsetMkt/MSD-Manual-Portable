@@ -214,21 +214,21 @@
             // Then we check if the database exists
             // If it does, we load the read the data from the database
             // If it doesn't, we load the JSON file and create the database
-            // Key: data, Value: JSON data
+            // Key: search, Value: JSON data
             title.innerHTML = "Search - Checking Database...";
             var db;
-            var request = window.indexedDB.open("searchcontent", 1);
+            var request = window.indexedDB.open("MSD-Manual-Portable", 1);
             request.onsuccess = function (event) {
                 db = request.result;
                 // We check if the database is empty
-                var transaction = db.transaction(["data"], "readonly");
-                var objectStore = transaction.objectStore("data");
+                var transaction = db.transaction(["search"], "readonly");
+                var objectStore = transaction.objectStore("search");
                 var cursor = objectStore.openCursor();
                 cursor.onsuccess = function (event) {
                     var result = event.target.result;
                     if (result) {
                         // If the database is not empty, we load the data from the database
-                        window.jsonData = result.value.data;
+                        window.jsonData = result.value.search;
                         title.innerHTML = "Search - Database Loaded";
                     } else {
                         // If the database is empty
@@ -240,10 +240,10 @@
             };
             request.onupgradeneeded = function (event) {
                 db = event.target.result;
-                var objectStore = db.createObjectStore("data", {
+                var objectStore = db.createObjectStore("search", {
                     keyPath: "id"
                 });
-                objectStore.createIndex("data", "data", {
+                objectStore.createIndex("search", "search", {
                     unique: false
                 });
                 // Load the data from the JSON file
@@ -255,11 +255,11 @@
                     if (xobj.readyState == 4 && xobj.status == "200") {
                         var data = JSON.parse(xobj.responseText);
                         // Add the data to the database
-                        var transaction = db.transaction(["data"], "readwrite");
-                        var objectStore = transaction.objectStore("data");
+                        var transaction = db.transaction(["search"], "readwrite");
+                        var objectStore = transaction.objectStore("search");
                         var request = objectStore.put({
-                            id: "data",
-                            data: data
+                            id: "search",
+                            search: data
                         });
                         window.jsonData = JSON.parse(xobj.responseText);
                         // window.jsonData is used to set a global variable.
@@ -306,7 +306,7 @@
         var deleteDB = url.searchParams.get("clear");
         if (deleteDB == "true") {
             // Delete the database
-            var request = window.indexedDB.deleteDatabase("searchcontent");
+            var request = window.indexedDB.deleteDatabase("MSD-Manual-Portable");
             request.onsuccess = function (event) {
                 //console.log("Database Deleted");
             };
