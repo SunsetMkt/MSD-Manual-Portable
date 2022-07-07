@@ -35,6 +35,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="search.html">Search</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="window.location.href += '?clear=true'">Refresh</a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -191,6 +194,25 @@
 
             document.getElementById("menu").innerHTML = indexhtml;
             title.innerHTML = "Menu - Index Generated";
+        }
+    </script>
+    <script>
+        // Check URL argument to delete IndexedDB database
+        var url = new URL(window.location.href);
+        var deleteDB = url.searchParams.get("clear");
+        if (deleteDB == "true") {
+            // Delete the database
+            var request = window.indexedDB.deleteDatabase("indexdata");
+            request.onsuccess = function (event) {
+                //console.log("Database Deleted");
+            };
+            request.onerror = function (event) {
+                //console.log("Database Error");
+            };
+            request.onblocked = function (event) {
+                //console.log("Database Error");
+            };
+            window.location.href = "search.html";
         }
     </script>
 </body>
