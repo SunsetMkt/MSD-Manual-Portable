@@ -11,7 +11,7 @@ import requests
 url = "https://mmcdnprdcontent.azureedge.net/MSDZHProfessionalMedicalTopics.zip"
 
 
-def getZip():
+def getzip():
     print("Downloading MSDZHProfessionalMedicalTopics.zip")
     r = requests.get(url)
     with open("MSDZHProfessionalMedicalTopics.zip", "wb") as f:
@@ -27,7 +27,11 @@ def unzip():
     print("Unzipped MSDZHProfessionalMedicalTopics.zip")
 
 
-if __name__ == "__main__":
-    getZip()
+def main():
+    getzip()
     unzip()
     print("Done!")
+
+
+if __name__ == "__main__":
+    main()
