@@ -11,6 +11,7 @@ import os
 import shutil
 import sys
 import threading
+import time
 import webbrowser
 import zipfile
 
@@ -84,7 +85,7 @@ webbrowser.open('http://localhost:' + str(PORT))
 # Ctrl+C to stop the server
 try:
     while True:
-        pass
+        time.sleep(100) # sleep to avoid performance issues
 except KeyboardInterrupt:
     sys.exit()
 except Exception as e:
