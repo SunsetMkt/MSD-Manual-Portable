@@ -9,6 +9,9 @@
 import http.server
 import os
 import shutil
+import sys
+import threading
+import webbrowser
 import zipfile
 
 import requests
@@ -60,9 +63,32 @@ os.chdir('MSDZHProfessionalMedicalTopics')
 
 # Run the HTTP server
 print("Starting the HTTP server...")
-print("You can now open the MSD Manual in your browser at http://localhost:8080/")
-print("The HTTP server is running on localhost:8080.")
+
+
+def httpd(PORT):
+    httpd = http.server.HTTPServer(
+        ('localhost', PORT), http.server.SimpleHTTPRequestHandler)
+    httpd.serve_forever()
+
+
+# Start server and open browser
+PORT = 16771  # 16771 is the first five digits of MSD's SHA-1 hash
+server = threading.Thread(target=httpd, args=(PORT,))
+server.daemon = True
+server.start()
+print("The HTTP server is running on localhost:+PORT+...")
+print("You can now open the MSD Manual in your browser at http://localhost:"+str(PORT)+"/")
 print("Press Ctrl+C to stop the server.")
-httpd = http.server.HTTPServer(
-    ('localhost', 8080), http.server.SimpleHTTPRequestHandler)
-httpd.serve_forever()
+webbrowser.open('http://localhost:' + str(PORT))
+
+# Ctrl+C to stop the server
+try:
+    while True:
+        pass
+except KeyboardInterrupt:
+    sys.exit()
+except Exception as e:
+    print(e)
+    sys.exit()
+finally:
+    sys.exit()
