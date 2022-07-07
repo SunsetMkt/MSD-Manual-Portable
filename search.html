@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<!--
+    MSD-Manual-Portable
+    A method to build a portable and offline-available MSD Manual.
+    https://github.com/lwd-temp/MSD-Manual-Portable
+
+    Search Page
+    Read from JSON file and display the results.
+-->
+<!--
+    Chapters - SectionId.html
+    Medical Topics - TopicId.html
+    Clinical Calculator - Content/Calcdumps/TopicId
+    Tables - TopicId
+    Images - TopicUrl，需要去除`https://www.msdmanuals.cn/`实现本地访问
+    Figures - TopicUrl，需要去除`https://www.msdmanuals.cn/`实现本地访问
+    3D Models - TopicUrl
+    Videos - https://players.brightcove.net/3850378299001/default_default/index.html?videoId=RelatedTopicId
+-->
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Search - MSD-Manual-Portable</title>
+    <!-- Bootstrap CSS via CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <script>
+        // Load JSON file
+        var xobj = new XMLHttpRequest();
+        xobj.overrideMimeType("application/json");
+        xobj.open('GET', 'MSDZHProfessionalMedicalTopics/Json/searchcontent.json', true);
+        xobj.onreadystatechange = function () {
+            if (xobj.readyState == 4 && xobj.status == "200") {
+                window.jsonData = JSON.parse(xobj.responseText);
+            }
+        };
+        xobj.send(null);
+
+        function nullHandler(data) {
+            if (data == null) {
+                return "";
+            } else {
+                return data;
+            }
+        }
+
+        // Search function
+        function search() {
+            var data = window.jsonData;
+            var searchinput = document.getElementById("search").value;
+            var searchresult = document.getElementById("result");
+            var searchresulthtml = "";
+
+            // For every item in data
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].ContentType == "Chapters") {
+                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].ChapterTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
+                        searchresulthtml += "<tr>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].TopicId) + ".html'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].ChapterId) + ".html'>" + nullHandler(data[i].ChapterTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
+                        searchresulthtml += "</tr>";
+                    }
+                }
+                if (data[i].ContentType == "Medical Topics") {
+                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
+                        searchresulthtml += "<tr>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].TopicId) + ".html'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].ChapterId) + ".html'>" + nullHandler(data[i].ChapterTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
+                        searchresulthtml += "</tr>";
+                    }
+                }
+                if (data[i].ContentType == "Clinical Calculator") {
+                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
+                        searchresulthtml += "<tr>";
+                        searchresulthtml += "<td><a href='Content/Calcdumps/" + nullHandler(data[i].TopicId) + ".html'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].ChapterId) + ".html'>" + nullHandler(data[i].ChapterTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
+                        searchresulthtml += "</tr>";
+                    }
+                }
+                if (data[i].ContentType == "Tables") {
+                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
+                        searchresulthtml += "<tr>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].TopicId) + "'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].ChapterId) + ".html'>" + nullHandler(data[i].ChapterTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
+                        searchresulthtml += "</tr>";
+                    }
+                }
+                if (data[i].ContentType == "Images") {
+                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
+                        searchresulthtml += "<tr>";
+                        var TopicUrl = nullHandler(data[i].TopicUrl);
+                        // Remove `https://www.msdmanuals.cn/` from string
+                        TopicUrl = TopicUrl.replace("https://www.msdmanuals.cn/", "");
+                        searchresulthtml += "<td><a href='" + nullHandler(TopicUrl) + "'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].RelatedTopicId) + ".html'>" + nullHandler(data[i].RelatedTopicTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
+                        searchresulthtml += "</tr>";
+                    }
+                }
+                if (data[i].ContentType == "Figures") {
+                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
+                        searchresulthtml += "<tr>";
+                        var TopicUrl = nullHandler(data[i].TopicUrl);
+                        // Remove `https://www.msdmanuals.cn/` from string
+                        TopicUrl = TopicUrl.replace("https://www.msdmanuals.cn/", "");
+                        searchresulthtml += "<td><a href='" + nullHandler(TopicUrl) + "'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].RelatedTopicId) + ".html'>" + nullHandler(data[i].RelatedTopicTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
+                        searchresulthtml += "</tr>";
+                    }
+                }
+                if (data[i].ContentType == "3D Models") {
+                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
+                        searchresulthtml += "<tr>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].TopicUrl) + "'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].RelatedTopicId) + ".html'>" + nullHandler(data[i].RelatedTopicTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
+                        searchresulthtml += "</tr>";
+                    }
+                }
+                if (data[i].ContentType == "Videos") {
+                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
+                        searchresulthtml += "<tr>";
+                        searchresulthtml += "<td><a href='https://players.brightcove.net/3850378299001/default_default/index.html?videoId=" + nullHandler(data[i].TopicId) + "'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].RelatedTopicId) + ".html'>" + nullHandler(data[i].RelatedTopicTitle) + "</a></td>";
+                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
+                        searchresulthtml += "</tr>";
+                    }
+                }
+            }
+
+            searchresult.innerHTML = searchresulthtml;
+        }
+    </script>
+</head>
+
+<body>
+    <!--Search Button call search(value)-->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Search</h1>
+                <div class="form-group">
+                    <input type="text" id="search" name="search" placeholder="Search">
+                    <button type="submit" class="btn btn-primary" onclick="search()">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Search Result-->
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>TopicTitle</th>
+                        <th>ChapterTitle</th>
+                        <th>SectionTitle</th>
+                    </tr>
+                </thead>
+                <tbody id="result">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

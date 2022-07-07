@@ -96,6 +96,8 @@ A method to build a portable and offline-available MSD Manual.
     ...
 ```
 
+其中，`MetaInfo`字段为`Topics`或`Chapters`，`Id`字段对应资源文件目录中的同名HTML文件。
+
 ### `allcvtopicresources.json`内容举例
 ```json
 [
@@ -116,7 +118,12 @@ A method to build a portable and offline-available MSD Manual.
 ### `Section-Chapter`
 根据前述内容，通过`sections.json`和`allchapterstopics.json`我们可以完整获取`Section-Chapter`信息。
 
-运行`Section-Chapter.py`解析并生成HTML目录。
+TODO
 
 ### `Section-Chapter-Topic`
 TODO
+
+## 搜索
+通过分析`searchcontent.json`文件，我们可以获取到所有的搜索内容。
+
+具体实现见`search.html`。
