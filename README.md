@@ -126,4 +126,4 @@ TODO
 ## 搜索
 通过分析`searchcontent.json`文件，我们可以获取到所有的搜索内容。
 
-具体实现见`search.html`。
+具体实现见`HTML/search.html`。
