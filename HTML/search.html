@@ -181,17 +181,31 @@
         var title = document.getElementById("title");
         // Load JSON file
         title.innerHTML = "Search - Loading Database...";
-        var xobj = new XMLHttpRequest();
-        xobj.overrideMimeType("application/json");
-        xobj.open('GET', 'Json/searchcontent.json', true);
-        xobj.onreadystatechange = function () {
-            if (xobj.readyState == 4 && xobj.status == "200") {
-                window.jsonData = JSON.parse(xobj.responseText);
-                // window.jsonData is used to set a global variable.
-                title.innerHTML = "Search - Database Loaded";
-            }
-        };
-        xobj.send(null);
+        // Check localStorage for data
+        if (localStorage.getItem("data") != null) {
+            window.jsonData = JSON.parse(localStorage.getItem("data"));
+            title.innerHTML = "Search - Database Loaded";
+        } else {
+            // Load JSON file
+            var xobj = new XMLHttpRequest();
+            xobj.overrideMimeType("application/json");
+            xobj.open('GET', 'Json/searchcontent.json', true);
+            xobj.onreadystatechange = function () {
+                if (xobj.readyState == 4 && xobj.status == "200") {
+                    localStorage.setItem("data", xobj.responseText);
+                    window.jsonData = JSON.parse(xobj.responseText);
+                    // window.jsonData is used to set a global variable.
+                    title.innerHTML = "Search - Database Loaded";
+                }
+            };
+            xobj.send(null);
+        }
+
+        // Check for url argument to clear localStorage
+        if (window.location.href.indexOf("clear") != -1) {
+            localStorage.removeItem("data");
+            window.location.href = "search.html";
+        }
     </script>
 </body>
 
