@@ -43,6 +43,7 @@ else:
     sys.exit(1)
 # If not zh or en
 if language != 'zh' and language != 'en':
+    print("Undefined language: " + language)
     print('Usage: python start.py [zh/en]')
     sys.exit(1)
 
@@ -51,6 +52,10 @@ if language == 'zh':
     url = "https://mmcdnprdcontent.azureedge.net/MSDZHProfessionalMedicalTopics.zip"
 elif language == 'en':
     url = "https://mmcdnprdcontent.azureedge.net/MSDProfessionalMedicalTopics.zip"
+else:
+    # Fallback to zh
+    print("Undefined language, fallback to zh.")
+    url = "https://mmcdnprdcontent.azureedge.net/MSDZHProfessionalMedicalTopics.zip"
 
 if not (os.path.exists(getFilename(url)) or os.path.exists(getFilenameWithoutExtension(getFilename(url)))):
     print("Downloading MSD Manual...")
