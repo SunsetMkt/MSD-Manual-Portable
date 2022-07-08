@@ -46,6 +46,19 @@ if not os.path.exists("MSDZHProfessionalMedicalTopics"):
         zip_ref.extractall('MSDZHProfessionalMedicalTopics')
     print("Unpacking complete.")
 
+    # Try getting favicon.ico
+    favicon = "https://www.msdmanuals.com/favicon.ico"
+    print("Downloading favicon.ico...")
+    try:
+        r = requests.get(favicon)
+        with open(os.path.join("HTML", "favicon.ico"), "wb") as f:
+            f.write(r.content)
+        print("Download complete.")
+    except:
+        print("Failed to get favicon.ico.")
+        print("This is not necessarily a problem.")
+        pass
+
     # Copy the HTML files to the folder
     print("Copying HTML files to the folder...")
     # Copy all files in HTML folder to the folder
@@ -85,7 +98,7 @@ webbrowser.open('http://localhost:' + str(PORT))
 # Ctrl+C to stop the server
 try:
     while True:
-        time.sleep(100) # sleep to avoid performance issues
+        time.sleep(100)  # sleep to avoid performance issues
 except KeyboardInterrupt:
     sys.exit()
 except Exception as e:

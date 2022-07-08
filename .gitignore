@@ -131,3 +131,6 @@ dmypy.json
 # MSDZHProfessionalMedicalTopics.zip and unzipped files
 MSDZHProfessionalMedicalTopics/
 MSDZHProfessionalMedicalTopics.zip
+
+# favicon.ico
+HTML/favicon.ico
