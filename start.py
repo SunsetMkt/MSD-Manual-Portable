@@ -34,17 +34,6 @@ if not (os.path.exists("MSDZHProfessionalMedicalTopics.zip") or os.path.exists("
     print("Download complete.")
     # Rename the downloaded file
     os.rename(path, 'MSDZHProfessionalMedicalTopics.zip')
-else:
-    print("MSD Manual already downloaded.")
-
-
-if not os.path.exists("MSDZHProfessionalMedicalTopics"):
-    # Unpack the MSD Manual to MSDZHProfessionalMedicalTopics folder
-    path = 'MSDZHProfessionalMedicalTopics.zip'
-    print("Unpacking MSD Manual...")
-    with zipfile.ZipFile(path, 'r') as zip_ref:
-        zip_ref.extractall('MSDZHProfessionalMedicalTopics')
-    print("Unpacking complete.")
 
     # Try getting favicon.ico
     favicon = "https://www.msdmanuals.com/favicon.ico"
@@ -58,6 +47,18 @@ if not os.path.exists("MSDZHProfessionalMedicalTopics"):
         print("Failed to get favicon.ico.")
         print("This is not necessarily a problem.")
         pass
+
+else:
+    print("MSD Manual already downloaded.")
+
+
+if not os.path.exists("MSDZHProfessionalMedicalTopics"):
+    # Unpack the MSD Manual to MSDZHProfessionalMedicalTopics folder
+    path = 'MSDZHProfessionalMedicalTopics.zip'
+    print("Unpacking MSD Manual...")
+    with zipfile.ZipFile(path, 'r') as zip_ref:
+        zip_ref.extractall('MSDZHProfessionalMedicalTopics')
+    print("Unpacking complete.")
 
     # Copy the HTML files to the folder
     print("Copying HTML files to the folder...")
@@ -90,7 +91,7 @@ PORT = 16771  # 16771 is the first five digits of MSD's SHA-1 hash
 server = threading.Thread(target=httpd, args=(PORT,))
 server.daemon = True
 server.start()
-print("The HTTP server is running on localhost:"+PORT+"...")
+print("The HTTP server is running on localhost:"+str(PORT)+"...")
 print("You can now open the MSD Manual in your browser at http://localhost:"+str(PORT)+"/")
 print("Press Ctrl+C to stop the server.")
 webbrowser.open('http://localhost:' + str(PORT))
