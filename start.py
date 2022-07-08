@@ -18,13 +18,44 @@ import zipfile
 import requests
 from clint.textui import progress
 
-# Download the MSD Manual
-url = "https://mmcdnprdcontent.azureedge.net/MSDZHProfessionalMedicalTopics.zip"
 
-if not (os.path.exists("MSDZHProfessionalMedicalTopics.zip") or os.path.exists("MSDZHProfessionalMedicalTopics")):
+def getFilename(url):
+    return url.split('/')[-1]
+
+
+def getFilenameWithoutExtension(filename):
+    return filename.split('.')[0]
+
+
+def httpd(PORT):
+    httpd = http.server.HTTPServer(
+        ('localhost', PORT), http.server.SimpleHTTPRequestHandler)
+    httpd.serve_forever()
+
+
+# Get system arguments: blank/zh/en
+if len(sys.argv) == 1:
+    language = 'zh'
+elif len(sys.argv) == 2:
+    language = sys.argv[1]
+else:
+    print('Usage: python start.py [zh/en]')
+    sys.exit(1)
+# If not zh or en
+if language != 'zh' and language != 'en':
+    print('Usage: python start.py [zh/en]')
+    sys.exit(1)
+
+# Download the MSD Manual
+if language == 'zh':
+    url = "https://mmcdnprdcontent.azureedge.net/MSDZHProfessionalMedicalTopics.zip"
+elif language == 'en':
+    url = "https://mmcdnprdcontent.azureedge.net/MSDProfessionalMedicalTopics.zip"
+
+if not (os.path.exists(getFilename(url)) or os.path.exists(getFilenameWithoutExtension(getFilename(url)))):
     print("Downloading MSD Manual...")
     r = requests.get(url, stream=True)
-    path = 'MSDZHProfessionalMedicalTopics.zip.tmp'
+    path = getFilename(url)+'.tmp'
     with open(path, 'wb') as f:
         total_length = int(r.headers.get('content-length'))
         for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1):
@@ -33,7 +64,7 @@ if not (os.path.exists("MSDZHProfessionalMedicalTopics.zip") or os.path.exists("
                 f.flush()
     print("Download complete.")
     # Rename the downloaded file
-    os.rename(path, 'MSDZHProfessionalMedicalTopics.zip')
+    os.rename(path, getFilename(url))
 
     # Try getting favicon.ico
     favicon = "https://www.msdmanuals.com/favicon.ico"
@@ -52,39 +83,35 @@ else:
     print("MSD Manual already downloaded.")
 
 
-if not os.path.exists("MSDZHProfessionalMedicalTopics"):
+if not os.path.exists(getFilenameWithoutExtension(getFilename(url))):
     # Unpack the MSD Manual to MSDZHProfessionalMedicalTopics folder
-    path = 'MSDZHProfessionalMedicalTopics.zip'
+    path = getFilename(url)
     print("Unpacking MSD Manual...")
     with zipfile.ZipFile(path, 'r') as zip_ref:
-        zip_ref.extractall('MSDZHProfessionalMedicalTopics')
+        zip_ref.extractall(getFilenameWithoutExtension(getFilename(url)))
     print("Unpacking complete.")
+    print(getFilename(url) +
+          " can be removed manually without affecting the portable MSD Manual.")
 
     # Copy the HTML files to the folder
     print("Copying HTML files to the folder...")
     # Copy all files in HTML folder to the folder
     for file in os.listdir('HTML'):
         shutil.copy(os.path.join('HTML', file),
-                    'MSDZHProfessionalMedicalTopics')
+                    getFilenameWithoutExtension(getFilename(url)))
     print("Copying complete.")
 else:
     print("MSD Manual already unpacked.")
 
 
 # Change the current working directory to the folder
-print("Changing the current working directory to MSDZHProfessionalMedicalTopics...")
-os.chdir('MSDZHProfessionalMedicalTopics')
+print("Changing the current working directory to " +
+      getFilenameWithoutExtension(getFilename(url))+"...")
+os.chdir(getFilenameWithoutExtension(getFilename(url)))
 
 
 # Run the HTTP server
 print("Starting the HTTP server...")
-
-
-def httpd(PORT):
-    httpd = http.server.HTTPServer(
-        ('localhost', PORT), http.server.SimpleHTTPRequestHandler)
-    httpd.serve_forever()
-
 
 # Start server and open browser
 PORT = 16771  # 16771 is the first five digits of MSD's SHA-1 hash
