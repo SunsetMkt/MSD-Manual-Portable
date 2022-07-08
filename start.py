@@ -90,7 +90,7 @@ PORT = 16771  # 16771 is the first five digits of MSD's SHA-1 hash
 server = threading.Thread(target=httpd, args=(PORT,))
 server.daemon = True
 server.start()
-print("The HTTP server is running on localhost:+PORT+...")
+print("The HTTP server is running on localhost:"+PORT+"...")
 print("You can now open the MSD Manual in your browser at http://localhost:"+str(PORT)+"/")
 print("Press Ctrl+C to stop the server.")
 webbrowser.open('http://localhost:' + str(PORT))
