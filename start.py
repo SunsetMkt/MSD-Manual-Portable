@@ -9,6 +9,7 @@
 import http.server
 import os
 import shutil
+import socket
 import sys
 import threading
 import time
@@ -25,6 +26,23 @@ def getFilename(url):
 
 def getFilenameWithoutExtension(filename):
     return filename.split('.')[0]
+
+
+def check_port_available(port):
+    # Check if port is available
+    # If not, try to use port +1, +2, ...
+    print('Checking port {}...'.format(port))
+    while True:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.bind(('localhost', port))
+            s.close()
+            print('Port {} is available.'.format(port))
+            break
+        except socket.error:
+            print('Port {} is not available. Trying next one...'.format(port))
+            port += 1
+    return port
 
 
 def httpd(PORT):
@@ -57,7 +75,7 @@ if language == 'zh':
     PORT = 16771
 elif language == 'en':
     url = "https://mmcdnprdcontent.azureedge.net/MSDProfessionalMedicalTopics.zip"
-    PORT = 16772  # Add 1 to avoid collision with zh
+    PORT = 16871  # Add 100 to avoid collision with zh
 else:
     # Fallback to zh
     print("Undefined language, fallback to zh.")
@@ -125,6 +143,7 @@ os.chdir(getFilenameWithoutExtension(getFilename(url)))
 print("Starting the HTTP server...")
 
 # Start server and open browser
+PORT = check_port_available(PORT)
 server = threading.Thread(target=httpd, args=(PORT,))
 server.daemon = True
 server.start()
