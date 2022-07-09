@@ -33,6 +33,10 @@ def httpd(PORT):
     httpd.serve_forever()
 
 
+# Default HTTP Server Port for fallback.
+PORT = 16771  # 16771 is the first five digits of MSD's SHA-1 hash
+
+
 # Get system arguments: blank/zh/en
 if len(sys.argv) == 1:
     language = 'zh'
@@ -50,12 +54,15 @@ if language != 'zh' and language != 'en':
 # Download the MSD Manual
 if language == 'zh':
     url = "https://mmcdnprdcontent.azureedge.net/MSDZHProfessionalMedicalTopics.zip"
+    PORT = 16771
 elif language == 'en':
     url = "https://mmcdnprdcontent.azureedge.net/MSDProfessionalMedicalTopics.zip"
+    PORT = 16772  # Add 1 to avoid collision with zh
 else:
     # Fallback to zh
     print("Undefined language, fallback to zh.")
     url = "https://mmcdnprdcontent.azureedge.net/MSDZHProfessionalMedicalTopics.zip"
+    PORT = 16771
 
 if not (os.path.exists(getFilename(url)) or os.path.exists(getFilenameWithoutExtension(getFilename(url)))):
     print("Downloading MSD Manual...")
@@ -119,7 +126,6 @@ os.chdir(getFilenameWithoutExtension(getFilename(url)))
 print("Starting the HTTP server...")
 
 # Start server and open browser
-PORT = 16771  # 16771 is the first five digits of MSD's SHA-1 hash
 server = threading.Thread(target=httpd, args=(PORT,))
 server.daemon = True
 server.start()
