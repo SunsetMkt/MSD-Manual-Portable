@@ -90,7 +90,6 @@ if not (os.path.exists(getFilename(url)) or os.path.exists(getFilenameWithoutExt
         print("Failed to get favicon.ico.")
         print("This is not necessarily a problem.")
         pass
-
 else:
     print("MSD Manual already downloaded.")
 
