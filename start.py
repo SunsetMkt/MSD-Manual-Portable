@@ -20,6 +20,16 @@ import requests
 from clint.textui import progress
 
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    # This is how should start.py work with Pyinstaller:
+    # HTML resources are packed in the executable and MSDProfessionalMedicalTopics.zip should be placed in where the executable is.
+
+    if hasattr(sys, "_MEIPASS"):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(relative_path)
+
+
 def getFilename(url):
     return url.split('/')[-1]
 
@@ -101,7 +111,7 @@ if not (os.path.exists(getFilename(url)) or os.path.exists(getFilenameWithoutExt
     print("Downloading favicon.ico...")
     try:
         r = requests.get(favicon)
-        with open(os.path.join("HTML", "favicon.ico"), "wb") as f:
+        with open(resource_path(os.path.join("HTML", "favicon.ico")), "wb") as f:
             f.write(r.content)
         print("Download complete.")
     except:
@@ -125,8 +135,8 @@ if not os.path.exists(getFilenameWithoutExtension(getFilename(url))):
     # Copy the HTML files to the folder
     print("Copying HTML files to the folder...")
     # Copy all files in HTML folder to the folder
-    for file in os.listdir('HTML'):
-        shutil.copy(os.path.join('HTML', file),
+    for file in os.listdir(resource_path('HTML')):
+        shutil.copy(resource_path(os.path.join('HTML', file)),
                     getFilenameWithoutExtension(getFilename(url)))
     print("Copying complete.")
 else:
