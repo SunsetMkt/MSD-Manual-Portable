@@ -21,13 +21,13 @@ jobs:
           path: .
 
       - name: Copy LICENSE.txt to dist
-        run: cp LICENSE src/dist/windows/LICENSE.txt
+        run: cp LICENSE dist/windows/LICENSE.txt
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: MSD-Manual-Portable
-          path: src/dist/windows
+          path: dist/windows
 
       - name: Create Release
         id: create_release
@@ -46,7 +46,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: "src/dist/windows/*.exe"
+          file: "dist/windows/*.exe"
           release_id: ${{ steps.create_release.outputs.id }}
           overwrite: true
           verbose: true
