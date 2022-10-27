@@ -4,8 +4,9 @@
 # A method to build a portable and offline-available MSD Manual.
 # https://github.com/lwd-temp/MSD-Manual-Portable
 #
-# start.py
+# MSD-Manual-Portable.py
 # Download, unpack the MSD Manual, copy HTML files to the portable folder and run a HTTP server.
+import argparse
 import http.server
 import os
 import shutil
@@ -22,7 +23,7 @@ from clint.textui import progress
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
-    # This is how should start.py work with Pyinstaller:
+    # This is how should MSD-Manual-Portable.py work with Pyinstaller:
     # HTML resources are packed in the executable and MSDProfessionalMedicalTopics.zip should be placed in where the executable is.
 
     if hasattr(sys, "_MEIPASS"):
@@ -62,35 +63,57 @@ def httpd(PORT):
 
 
 # Default HTTP Server Port for fallback.
-PORT = 16771  # 16771 is the first five digits of MSD's SHA-1 hash
+DEFPORT = 33914  # 33914 is the first five digits of MSD's SHA-256 hash
 
 
-# Get system arguments: blank/zh/en
-if len(sys.argv) == 1:
-    language = 'zh'
-elif len(sys.argv) == 2:
-    language = sys.argv[1]
-else:
-    print('Usage: python start.py [zh/en]')
-    sys.exit(1)
-# If not zh or en
-if language != 'zh' and language != 'en':
-    print("Undefined language: " + language)
-    print('Usage: python start.py [zh/en]')
-    sys.exit(1)
+# argparse
+parser = argparse.ArgumentParser(
+    # prog='MSD-Manual-Portable',
+    description='Host a portable and offline-available MSD Manual.',
+    epilog='https://github.com/lwd-temp/MSD-Manual-Portable')
+# lang: en zh
+parser.add_argument('-l', '--lang', default='zh',
+                    choices=['en', 'zh'], help='Language of the MSD Manual. Default: zh')
+# version: professional consumer
+parser.add_argument('-v', '--version', default='professional', choices=[
+                    'professional', 'consumer'], help='Version of the MSD Manual. Default: professional')
+# port: any integer, default: PORT
+parser.add_argument('-p', '--port', default=DEFPORT, type=int,
+                    help='Port of the HTTP Server. Default port changes for different languages and versions.')
+# silent: do not open browser
+parser.add_argument('-s', '--silent', action='store_true',
+                    help='Do not open browser.')
+
+args = parser.parse_args()
+
+# Set PORT
+PORT = args.port
 
 # Download the MSD Manual
-if language == 'zh':
-    url = "https://mmcdnprdcontent.azureedge.net/MSDZHProfessionalMedicalTopics.zip"
-    PORT = 16771
-elif language == 'en':
-    url = "https://mmcdnprdcontent.azureedge.net/MSDProfessionalMedicalTopics.zip"
-    PORT = 16871  # Add 100 to avoid collision with zh
+baseURL = "https://mmcdnprdcontent.azureedge.net/"
+if args.version == 'professional':
+    if args.lang == 'en':
+        filename = 'MSDProfessionalMedicalTopics.zip'
+        if PORT == DEFPORT:
+            PORT = DEFPORT
+    else:
+        filename = 'MSDZHProfessionalMedicalTopics.zip'
+        if PORT == DEFPORT:
+            PORT = DEFPORT + 100
+elif args.version == 'consumer':
+    if args.lang == 'en':
+        filename = 'MSDConsumerMedicalTopics.zip'
+        if PORT == DEFPORT:
+            PORT = DEFPORT + 200
+    else:
+        filename = 'MSDZHConsumerMedicalTopics.zip'
+        if PORT == DEFPORT:
+            PORT = DEFPORT + 300
 else:
-    # Fallback to zh
-    print("Undefined language, fallback to zh.")
-    url = "https://mmcdnprdcontent.azureedge.net/MSDZHProfessionalMedicalTopics.zip"
-    PORT = 16771
+    print('Error: Invalid version.')
+    sys.exit(1)
+
+url = baseURL + filename
 
 if not (os.path.exists(getFilename(url)) or os.path.exists(getFilenameWithoutExtension(getFilename(url)))):
     print("Downloading MSD Manual...")
@@ -160,7 +183,8 @@ server.start()
 print("The HTTP server is running on localhost:"+str(PORT)+"...")
 print("You can now open the MSD Manual in your browser at http://localhost:"+str(PORT)+"/")
 print("Press Ctrl+C to stop the server.")
-webbrowser.open('http://localhost:' + str(PORT))
+if not args.silent:
+    webbrowser.open('http://localhost:' + str(PORT))
 
 # Ctrl+C to stop the server
 try:

@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['start.py'],
+    ['MSD-Manual-Portable.py'],
     pathex=[],
     binaries=[],
     datas=[('HTML','HTML')],
@@ -27,7 +27,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='start',
+    name='MSD-Manual-Portable',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

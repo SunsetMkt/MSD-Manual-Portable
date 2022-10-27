@@ -8,7 +8,23 @@ A method to build a portable and offline-available MSD Manual.
 ## Quick Start
 ```shell
 $ pip3 install -r requirements.txt
-$ python3 start.py
+$ python3 MSD-Manual-Portable.py
+```
+
+## usage
+```shell
+usage: MSD-Manual-Portable.py [-h] [-l {en,zh}] [-v {professional,consumer}] [-p PORT] [-s]
+
+Host a portable and offline-available MSD Manual.
+
+options:
+  -h, --help            show this help message and exit
+  -l {en,zh}, --lang {en,zh}
+                        Language of the MSD Manual. Default: zh
+  -v {professional,consumer}, --version {professional,consumer}
+                        Version of the MSD Manual. Default: professional
+  -p PORT, --port PORT  Port of the HTTP Server. Default port changes for different languages and versions.
+  -s, --silent          Do not open browser.
 ```
 
 ## 关于《默沙东诊疗手册》
@@ -87,7 +103,7 @@ BLAKE2sp: d0de7b61c3b50721c5afead245077153a3559f36f152d8148b9f7fe278b5912d
 ## 快速开始
 下载并解压缩`MSDZHProfessionalMedicalTopics.zip`至`MSDZHProfessionalMedicalTopics`目录，将`HTML`文件夹中文件全部置入`MSDZHProfessionalMedicalTopics`目录，在`MSDZHProfessionalMedicalTopics`目录启动HTTP服务器，即可访问手册。
 
-这些步骤可以通过运行`start.py`自动完成，在第一次成功启动后不再需要互联网连接。
+这些步骤可以通过运行`MSD-Manual-Portable.py`自动完成，在第一次成功启动后不再需要互联网连接。
 
 无需理会浏览器控制台提示错误和HTTP服务器显示的任何404错误，这些错误由手册资源文件自身造成且不会影响手册的正常显示。
 
@@ -112,7 +128,7 @@ BLAKE2sp: 5e76aaecb491188c4be6baa719293b7b1d4b8ac832c1763189e15249d16f26fc
 
 若需要获取其他语言版本的资源文件，请自行获取URL并解压缩。
 
-`python3 start.py en`适用于获取英文版本资源文件。如若在同一个浏览器中启动过其他语言版本，则可能需要在目录(Menu)/搜索(Search)页面选择`Refresh`以便清除为了便于加载而在浏览器中本地存储的上个语言版本的缓存信息。
+`python3 MSD-Manual-Portable.py -l en`适用于获取英文版本资源文件。如若在同一个浏览器中启动过其他语言版本，则可能需要在目录(Menu)/搜索(Search)页面选择`Refresh`以便清除为了便于加载而在浏览器中本地存储的上个语言版本的缓存信息。
 
 ## 版权声明
 《默沙东诊疗手册》的版权归默沙东所有。此项目与默沙东无关。
