@@ -12,8 +12,8 @@
     Medical Topics - TopicId.html
     Clinical Calculator - Content/Calcdumps/TopicId
     Tables - TopicId
-    Images - TopicUrl，需要去除`https://www.msdmanuals.cn/`实现本地访问
-    Figures - TopicUrl，需要去除`https://www.msdmanuals.cn/`实现本地访问
+    Images - TopicUrl，需要去除`https://www.msdmanuals.cn/`或`https://www.msdmanuals.com/`实现本地访问
+    Figures - TopicUrl，需要去除`https://www.msdmanuals.cn/`或`https://www.msdmanuals.com/`实现本地访问
     3D Models - TopicUrl
     Videos - https://players.brightcove.net/3850378299001/default_default/index.html?videoId=RelatedTopicId
 -->
@@ -86,6 +86,8 @@
                         var TopicUrl = nullHandler(data[i].TopicUrl);
                         // Remove `https://www.msdmanuals.cn/` from string
                         TopicUrl = TopicUrl.replace("https://www.msdmanuals.cn/", "");
+                        // Remove `https://www.msdmanuals.com/` from string
+                        TopicUrl = TopicUrl.replace("https://www.msdmanuals.com/", "");
                         searchresulthtml += "<td><a href='" + nullHandler(TopicUrl) + "'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
                         searchresulthtml += "<td><a href='" + nullHandler(data[i].RelatedTopicId) + ".html'>" + nullHandler(data[i].RelatedTopicTitle) + "</a></td>";
                         searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
@@ -98,6 +100,8 @@
                         var TopicUrl = nullHandler(data[i].TopicUrl);
                         // Remove `https://www.msdmanuals.cn/` from string
                         TopicUrl = TopicUrl.replace("https://www.msdmanuals.cn/", "");
+                        // Remove `https://www.msdmanuals.com/` from string
+                        TopicUrl = TopicUrl.replace("https://www.msdmanuals.com/", "");
                         searchresulthtml += "<td><a href='" + nullHandler(TopicUrl) + "'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
                         searchresulthtml += "<td><a href='" + nullHandler(data[i].RelatedTopicId) + ".html'>" + nullHandler(data[i].RelatedTopicTitle) + "</a></td>";
                         searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
