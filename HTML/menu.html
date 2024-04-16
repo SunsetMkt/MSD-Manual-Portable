@@ -8,215 +8,252 @@
     Read from JSON file and display the menu.
 -->
 <html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
     <title>Menu - MSD-Manual-Portable</title>
-    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap.min.css" />
     <script src="jquery.min.js"></script>
     <script src="bootstrap.bundle.min.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="index.html">MSD-Manual-Portable</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="index.html">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="menu.html">Menu</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="search.html">Search</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="https://github.com/lwd-temp/MSD-Manual-Portable">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" onclick="window.location.href += '?clear=true'">Refresh</a>
-                </li>
-            </ul>
-        </div>
+      <a class="navbar-brand" href="index.html">MSD-Manual-Portable</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="menu.html">Menu</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="search.html">Search</a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="https://github.com/lwd-temp/MSD-Manual-Portable"
+              >About</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" onclick="window.location.href += '?clear=true'"
+              >Refresh</a
+            >
+          </li>
+        </ul>
+      </div>
     </nav>
 
     <!--Table of Content-->
     <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 id="title">Menu - Will NOT Work without JavaScript Enabled</h1>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col">Section</th>
-                            <th scope="col">Chapter</th>
-                            <th scope="col">Topic</th>
-                        </tr>
-                    </thead>
-                    <tbody id="menu">
-                        <tr>
-                            <td>SectionTitle</td>
-                            <td>ChapterTitle</td>
-                            <td>TopicTitle</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+      <div class="row">
+        <div class="col-md-12">
+          <h1 id="title">Menu - Will NOT Work without JavaScript Enabled</h1>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Section</th>
+                <th scope="col">Chapter</th>
+                <th scope="col">Topic</th>
+              </tr>
+            </thead>
+            <tbody id="menu">
+              <tr>
+                <td>SectionTitle</td>
+                <td>ChapterTitle</td>
+                <td>TopicTitle</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
     <!--End of Table of Content-->
     <script>
-        var title = document.getElementById("title");
+      var title = document.getElementById("title");
 
-        function loadJSON(url) {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', url, false);
-            xhr.send(null);
-            if (xhr.status == 200) {
-                return JSON.parse(xhr.responseText);
+      function loadJSON(url) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, false);
+        xhr.send(null);
+        if (xhr.status == 200) {
+          return JSON.parse(xhr.responseText);
+        }
+        return null;
+      }
+
+      function loadIndex(callback) {
+        // Load
+        title.innerHTML = "Menu - Loading index...";
+
+        // Index
+        var index;
+
+        // Load sections from JSON file
+        var sections = loadJSON("Json/sections.json");
+        var index = sections;
+        // for each section
+        for (var i = 0; i < index.sections.length; i++) {
+          uuid = index.sections[i].SectionId;
+          // Then we load the chapters from the JSON file
+          var chapters = loadJSON("Json/" + uuid + ".json");
+          // Then we append the chapters to the index
+          index.sections[i].chapters = chapters.chapters;
+        }
+
+        title.innerHTML = "Menu - Index loaded";
+
+        window.indexdata = index;
+
+        callback(index);
+        // Return index
+        return index;
+      }
+
+      // Check if browser supports IndexedDB
+      if (!window.indexedDB) {
+        loadIndex(function (index) {
+          geneIndex(index);
+        });
+      } else {
+        // Then we check if the database exists
+        // If it does, we load the read the data from the database
+        // If it doesn't, we load the JSON file and create the database
+        // Key: data, Value: JSON data
+        title.innerHTML = "Menu - Checking Database...";
+        var db;
+        var request = window.indexedDB.open("indexdata", 1);
+        request.onsuccess = function (event) {
+          db = request.result;
+          // We check if the database is empty
+          var transaction = db.transaction(["data"], "readonly");
+          var objectStore = transaction.objectStore("data");
+          var cursor = objectStore.openCursor();
+          cursor.onsuccess = function (event) {
+            var result = event.target.result;
+            if (result) {
+              // If the database is not empty, we load the data from the database
+              window.indexdata = result.value.data;
+              title.innerHTML = "Menu - Database Loaded";
+              geneIndex(window.indexdata);
+            } else {
+              // If the database is empty
+              // Done by onupgradeneeded
+              // No need to do anything here
             }
-            return null;
-        }
+          };
+          title.innerHTML = "Menu - Database Loaded";
+        };
+        request.onupgradeneeded = function (event) {
+          db = event.target.result;
+          var objectStore = db.createObjectStore("data", {
+            keyPath: "id",
+          });
+          objectStore.createIndex("data", "data", {
+            unique: false,
+          });
+          loadIndex(function (index) {
+            objectStore.transaction.oncomplete = function (event) {
+              var transaction = db.transaction(["data"], "readwrite");
+              var objectStore = transaction.objectStore("data");
+              objectStore.put({
+                id: "data",
+                data: index,
+              });
+              geneIndex(index);
+            };
+          });
+        };
+        request.onerror = function (event) {
+          title.innerHTML = "Menu - Database Error";
+          title.innerHTML = "Menu - Loading Database...";
+          loadIndex(function (index) {
+            geneIndex(index);
+          });
+        };
+        request.onblocked = function (event) {
+          title.innerHTML = "Menu - Database Error";
+          title.innerHTML = "Menu - Loading Database...";
+          loadIndex(function (index) {
+            geneIndex(index);
+          });
+        };
+      }
 
-        function loadIndex(callback) {
-            // Load
-            title.innerHTML = "Menu - Loading index...";
-
-            // Index
-            var index;
-
-            // Load sections from JSON file
-            var sections = loadJSON("Json/sections.json");
-            var index = sections;
-            // for each section
-            for (var i = 0; i < index.sections.length; i++) {
-                uuid = index.sections[i].SectionId;
-                // Then we load the chapters from the JSON file
-                var chapters = loadJSON("Json/" + uuid + ".json");
-                // Then we append the chapters to the index
-                index.sections[i].chapters = chapters.chapters;
+      // Generate the index
+      function geneIndex(index) {
+        title.innerHTML = "Menu - Generating Index...";
+        indexhtml = "";
+        // For each section
+        for (var i = 0; i < index.sections.length; i++) {
+          // We add the section title with h5
+          indexhtml +=
+            "<tr><td colspan='3'><h5>" +
+            index.sections[i].DisplayTitle +
+            "</h5></td></tr>";
+          // Then we add the chapters with a
+          for (var j = 0; j < index.sections[i].chapters.length; j++) {
+            indexhtml +=
+              "<tr><td></td><td><a href='" +
+              index.sections[i].chapters[j].ChapterId +
+              ".html'>" +
+              index.sections[i].chapters[j].DisplayTitle +
+              "</a></td><td></td></tr>";
+            // Then we add the topics with a
+            for (
+              var k = 0;
+              k < index.sections[i].chapters[j].Topics.length;
+              k++
+            ) {
+              indexhtml +=
+                "<tr><td></td><td></td><td><a href='" +
+                index.sections[i].chapters[j].Topics[k].TopicId +
+                ".html'>" +
+                index.sections[i].chapters[j].Topics[k].DisplayTitle +
+                "</a></td></tr>";
             }
-
-            title.innerHTML = "Menu - Index loaded";
-
-            window.indexdata = index;
-
-            callback(index);
-            // Return index
-            return index;
+          }
         }
 
-
-        // Check if browser supports IndexedDB
-        if (!window.indexedDB) {
-            loadIndex(function (index) { geneIndex(index) });
-        } else {
-            // Then we check if the database exists
-            // If it does, we load the read the data from the database
-            // If it doesn't, we load the JSON file and create the database
-            // Key: data, Value: JSON data
-            title.innerHTML = "Menu - Checking Database...";
-            var db;
-            var request = window.indexedDB.open("indexdata", 1);
-            request.onsuccess = function (event) {
-                db = request.result;
-                // We check if the database is empty
-                var transaction = db.transaction(["data"], "readonly");
-                var objectStore = transaction.objectStore("data");
-                var cursor = objectStore.openCursor();
-                cursor.onsuccess = function (event) {
-                    var result = event.target.result;
-                    if (result) {
-                        // If the database is not empty, we load the data from the database
-                        window.indexdata = result.value.data;
-                        title.innerHTML = "Menu - Database Loaded";
-                        geneIndex(window.indexdata);
-                    } else {
-                        // If the database is empty
-                        // Done by onupgradeneeded
-                        // No need to do anything here
-                    }
-                };
-                title.innerHTML = "Menu - Database Loaded";
-            };
-            request.onupgradeneeded = function (event) {
-                db = event.target.result;
-                var objectStore = db.createObjectStore("data", {
-                    keyPath: "id"
-                });
-                objectStore.createIndex("data", "data", {
-                    unique: false
-                });
-                loadIndex(function (index) {
-                    objectStore.transaction.oncomplete = function (event) {
-                        var transaction = db.transaction(["data"], "readwrite");
-                        var objectStore = transaction.objectStore("data");
-                        objectStore.put({
-                            id: "data",
-                            data: index
-                        });
-                        geneIndex(index);
-                    };
-                });
-            };
-            request.onerror = function (event) {
-                title.innerHTML = "Menu - Database Error";
-                title.innerHTML = "Menu - Loading Database...";
-                loadIndex(function (index) { geneIndex(index); });
-            };
-            request.onblocked = function (event) {
-                title.innerHTML = "Menu - Database Error";
-                title.innerHTML = "Menu - Loading Database...";
-                loadIndex(function (index) { geneIndex(index); });
-            };
-        }
-
-
-        // Generate the index
-        function geneIndex(index) {
-            title.innerHTML = "Menu - Generating Index...";
-            indexhtml = "";
-            // For each section
-            for (var i = 0; i < index.sections.length; i++) {
-                // We add the section title with h5
-                indexhtml += "<tr><td colspan='3'><h5>" + index.sections[i].DisplayTitle + "</h5></td></tr>";
-                // Then we add the chapters with a
-                for (var j = 0; j < index.sections[i].chapters.length; j++) {
-                    indexhtml += "<tr><td></td><td><a href='" + index.sections[i].chapters[j].ChapterId + ".html'>" + index.sections[i].chapters[j].DisplayTitle + "</a></td><td></td></tr>";
-                    // Then we add the topics with a
-                    for (var k = 0; k < index.sections[i].chapters[j].Topics.length; k++) {
-                        indexhtml += "<tr><td></td><td></td><td><a href='" + index.sections[i].chapters[j].Topics[k].TopicId + ".html'>" + index.sections[i].chapters[j].Topics[k].DisplayTitle + "</a></td></tr>";
-                    }
-                }
-            }
-
-            document.getElementById("menu").innerHTML = indexhtml;
-            title.innerHTML = "Menu - Index Generated";
-        }
+        document.getElementById("menu").innerHTML = indexhtml;
+        title.innerHTML = "Menu - Index Generated";
+      }
     </script>
     <script>
-        // Check URL argument to delete IndexedDB database
-        var url = new URL(window.location.href);
-        var deleteDB = url.searchParams.get("clear");
-        if (deleteDB == "true") {
-            // Delete the database
-            var request = window.indexedDB.deleteDatabase("indexdata");
-            request.onsuccess = function (event) {
-                //console.log("Database Deleted");
-            };
-            request.onerror = function (event) {
-                //console.log("Database Error");
-            };
-            request.onblocked = function (event) {
-                //console.log("Database Error");
-            };
-            window.location.href = "menu.html";
-        }
+      // Check URL argument to delete IndexedDB database
+      var url = new URL(window.location.href);
+      var deleteDB = url.searchParams.get("clear");
+      if (deleteDB == "true") {
+        // Delete the database
+        var request = window.indexedDB.deleteDatabase("indexdata");
+        request.onsuccess = function (event) {
+          //console.log("Database Deleted");
+        };
+        request.onerror = function (event) {
+          //console.log("Database Error");
+        };
+        request.onblocked = function (event) {
+          //console.log("Database Error");
+        };
+        window.location.href = "menu.html";
+      }
     </script>
-</body>
+  </body>
+</html>

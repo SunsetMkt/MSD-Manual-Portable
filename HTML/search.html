@@ -18,180 +18,372 @@
     Videos - https://players.brightcove.net/3850378299001/default_default/index.html?videoId=RelatedTopicId
 -->
 <html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
     <title>Search - MSD-Manual-Portable</title>
-    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap.min.css" />
     <script src="jquery.min.js"></script>
     <script src="bootstrap.bundle.min.js"></script>
     <script>
-        function nullHandler(data) {
-            if (data == null) {
-                return "";
-            } else {
-                return data;
+      function nullHandler(data) {
+        if (data == null) {
+          return "";
+        } else {
+          return data;
+        }
+      }
+
+      // Search function
+      function search() {
+        var data = window.jsonData;
+        var searchinput = document.getElementById("search").value;
+        var searchresult = document.getElementById("result");
+        var searchresulthtml = "";
+
+        // For every item in data
+        for (var i = 0; i < data.length; i++) {
+          if (data[i].ContentType == "Chapters") {
+            if (
+              nullHandler(data[i].Keywords)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1 ||
+              nullHandler(data[i].ChapterTitle)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1
+            ) {
+              searchresulthtml += "<tr>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].TopicId) +
+                ".html'>" +
+                nullHandler(data[i].TopicTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].ChapterId) +
+                ".html'>" +
+                nullHandler(data[i].ChapterTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].SectionId) +
+                ".html'>" +
+                nullHandler(data[i].SectionTitle) +
+                "</a></td>";
+              searchresulthtml += "</tr>";
             }
+          }
+          if (data[i].ContentType == "Medical Topics") {
+            if (
+              nullHandler(data[i].Keywords)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1 ||
+              nullHandler(data[i].TopicTitle)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1
+            ) {
+              searchresulthtml += "<tr>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].TopicId) +
+                ".html'>" +
+                nullHandler(data[i].TopicTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].ChapterId) +
+                ".html'>" +
+                nullHandler(data[i].ChapterTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].SectionId) +
+                ".html'>" +
+                nullHandler(data[i].SectionTitle) +
+                "</a></td>";
+              searchresulthtml += "</tr>";
+            }
+          }
+          if (data[i].ContentType == "Clinical Calculator") {
+            if (
+              nullHandler(data[i].Keywords)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1 ||
+              nullHandler(data[i].TopicTitle)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1
+            ) {
+              searchresulthtml += "<tr>";
+              searchresulthtml +=
+                "<td><a href='Content/Calcdumps/" +
+                nullHandler(data[i].TopicId) +
+                ".html'>" +
+                nullHandler(data[i].TopicTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].ChapterId) +
+                ".html'>" +
+                nullHandler(data[i].ChapterTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].SectionId) +
+                ".html'>" +
+                nullHandler(data[i].SectionTitle) +
+                "</a></td>";
+              searchresulthtml += "</tr>";
+            }
+          }
+          if (data[i].ContentType == "Tables") {
+            if (
+              nullHandler(data[i].Keywords)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1 ||
+              nullHandler(data[i].TopicTitle)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1
+            ) {
+              searchresulthtml += "<tr>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].TopicId) +
+                "'>" +
+                nullHandler(data[i].TopicTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].ChapterId) +
+                ".html'>" +
+                nullHandler(data[i].ChapterTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].SectionId) +
+                ".html'>" +
+                nullHandler(data[i].SectionTitle) +
+                "</a></td>";
+              searchresulthtml += "</tr>";
+            }
+          }
+          if (data[i].ContentType == "Images") {
+            if (
+              nullHandler(data[i].Keywords)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1 ||
+              nullHandler(data[i].TopicTitle)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1
+            ) {
+              searchresulthtml += "<tr>";
+              var TopicUrl = nullHandler(data[i].TopicUrl);
+              // Remove `https://www.msdmanuals.cn/` from string
+              TopicUrl = TopicUrl.replace("https://www.msdmanuals.cn/", "");
+              // Remove `https://www.msdmanuals.com/` from string
+              TopicUrl = TopicUrl.replace("https://www.msdmanuals.com/", "");
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(TopicUrl) +
+                "'>" +
+                nullHandler(data[i].TopicTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].RelatedTopicId) +
+                ".html'>" +
+                nullHandler(data[i].RelatedTopicTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].SectionId) +
+                ".html'>" +
+                nullHandler(data[i].SectionTitle) +
+                "</a></td>";
+              searchresulthtml += "</tr>";
+            }
+          }
+          if (data[i].ContentType == "Figures") {
+            if (
+              nullHandler(data[i].Keywords)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1 ||
+              nullHandler(data[i].TopicTitle)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1
+            ) {
+              searchresulthtml += "<tr>";
+              var TopicUrl = nullHandler(data[i].TopicUrl);
+              // Remove `https://www.msdmanuals.cn/` from string
+              TopicUrl = TopicUrl.replace("https://www.msdmanuals.cn/", "");
+              // Remove `https://www.msdmanuals.com/` from string
+              TopicUrl = TopicUrl.replace("https://www.msdmanuals.com/", "");
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(TopicUrl) +
+                "'>" +
+                nullHandler(data[i].TopicTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].RelatedTopicId) +
+                ".html'>" +
+                nullHandler(data[i].RelatedTopicTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].SectionId) +
+                ".html'>" +
+                nullHandler(data[i].SectionTitle) +
+                "</a></td>";
+              searchresulthtml += "</tr>";
+            }
+          }
+          if (data[i].ContentType == "3D Models") {
+            if (
+              nullHandler(data[i].Keywords)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1 ||
+              nullHandler(data[i].TopicTitle)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1
+            ) {
+              searchresulthtml += "<tr>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].TopicUrl) +
+                "'>" +
+                nullHandler(data[i].TopicTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].RelatedTopicId) +
+                ".html'>" +
+                nullHandler(data[i].RelatedTopicTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].SectionId) +
+                ".html'>" +
+                nullHandler(data[i].SectionTitle) +
+                "</a></td>";
+              searchresulthtml += "</tr>";
+            }
+          }
+          if (data[i].ContentType == "Videos") {
+            if (
+              nullHandler(data[i].Keywords)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1 ||
+              nullHandler(data[i].TopicTitle)
+                .toLowerCase()
+                .indexOf(searchinput.toLowerCase()) != -1
+            ) {
+              searchresulthtml += "<tr>";
+              searchresulthtml +=
+                "<td><a href='https://players.brightcove.net/3850378299001/default_default/index.html?videoId=" +
+                nullHandler(data[i].TopicId) +
+                "'>" +
+                nullHandler(data[i].TopicTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].RelatedTopicId) +
+                ".html'>" +
+                nullHandler(data[i].RelatedTopicTitle) +
+                "</a></td>";
+              searchresulthtml +=
+                "<td><a href='" +
+                nullHandler(data[i].SectionId) +
+                ".html'>" +
+                nullHandler(data[i].SectionTitle) +
+                "</a></td>";
+              searchresulthtml += "</tr>";
+            }
+          }
         }
 
-        // Search function
-        function search() {
-            var data = window.jsonData;
-            var searchinput = document.getElementById("search").value;
-            var searchresult = document.getElementById("result");
-            var searchresulthtml = "";
-
-            // For every item in data
-            for (var i = 0; i < data.length; i++) {
-                if (data[i].ContentType == "Chapters") {
-                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].ChapterTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
-                        searchresulthtml += "<tr>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].TopicId) + ".html'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].ChapterId) + ".html'>" + nullHandler(data[i].ChapterTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
-                        searchresulthtml += "</tr>";
-                    }
-                }
-                if (data[i].ContentType == "Medical Topics") {
-                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
-                        searchresulthtml += "<tr>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].TopicId) + ".html'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].ChapterId) + ".html'>" + nullHandler(data[i].ChapterTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
-                        searchresulthtml += "</tr>";
-                    }
-                }
-                if (data[i].ContentType == "Clinical Calculator") {
-                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
-                        searchresulthtml += "<tr>";
-                        searchresulthtml += "<td><a href='Content/Calcdumps/" + nullHandler(data[i].TopicId) + ".html'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].ChapterId) + ".html'>" + nullHandler(data[i].ChapterTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
-                        searchresulthtml += "</tr>";
-                    }
-                }
-                if (data[i].ContentType == "Tables") {
-                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
-                        searchresulthtml += "<tr>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].TopicId) + "'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].ChapterId) + ".html'>" + nullHandler(data[i].ChapterTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
-                        searchresulthtml += "</tr>";
-                    }
-                }
-                if (data[i].ContentType == "Images") {
-                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
-                        searchresulthtml += "<tr>";
-                        var TopicUrl = nullHandler(data[i].TopicUrl);
-                        // Remove `https://www.msdmanuals.cn/` from string
-                        TopicUrl = TopicUrl.replace("https://www.msdmanuals.cn/", "");
-                        // Remove `https://www.msdmanuals.com/` from string
-                        TopicUrl = TopicUrl.replace("https://www.msdmanuals.com/", "");
-                        searchresulthtml += "<td><a href='" + nullHandler(TopicUrl) + "'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].RelatedTopicId) + ".html'>" + nullHandler(data[i].RelatedTopicTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
-                        searchresulthtml += "</tr>";
-                    }
-                }
-                if (data[i].ContentType == "Figures") {
-                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
-                        searchresulthtml += "<tr>";
-                        var TopicUrl = nullHandler(data[i].TopicUrl);
-                        // Remove `https://www.msdmanuals.cn/` from string
-                        TopicUrl = TopicUrl.replace("https://www.msdmanuals.cn/", "");
-                        // Remove `https://www.msdmanuals.com/` from string
-                        TopicUrl = TopicUrl.replace("https://www.msdmanuals.com/", "");
-                        searchresulthtml += "<td><a href='" + nullHandler(TopicUrl) + "'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].RelatedTopicId) + ".html'>" + nullHandler(data[i].RelatedTopicTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
-                        searchresulthtml += "</tr>";
-                    }
-                }
-                if (data[i].ContentType == "3D Models") {
-                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
-                        searchresulthtml += "<tr>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].TopicUrl) + "'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].RelatedTopicId) + ".html'>" + nullHandler(data[i].RelatedTopicTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
-                        searchresulthtml += "</tr>";
-                    }
-                }
-                if (data[i].ContentType == "Videos") {
-                    if (nullHandler(data[i].Keywords).toLowerCase().indexOf(searchinput.toLowerCase()) != -1 || nullHandler(data[i].TopicTitle).toLowerCase().indexOf(searchinput.toLowerCase()) != -1) {
-                        searchresulthtml += "<tr>";
-                        searchresulthtml += "<td><a href='https://players.brightcove.net/3850378299001/default_default/index.html?videoId=" + nullHandler(data[i].TopicId) + "'>" + nullHandler(data[i].TopicTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].RelatedTopicId) + ".html'>" + nullHandler(data[i].RelatedTopicTitle) + "</a></td>";
-                        searchresulthtml += "<td><a href='" + nullHandler(data[i].SectionId) + ".html'>" + nullHandler(data[i].SectionTitle) + "</a></td>";
-                        searchresulthtml += "</tr>";
-                    }
-                }
-            }
-
-            searchresult.innerHTML = searchresulthtml;
-        }
+        searchresult.innerHTML = searchresulthtml;
+      }
     </script>
-</head>
+  </head>
 
-<body>
+  <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="index.html">MSD-Manual-Portable</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="index.html">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="menu.html">Menu</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="search.html">Search</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="https://github.com/lwd-temp/MSD-Manual-Portable">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" onclick="window.location.href += '?clear=true'">Refresh</a>
-                </li>
-            </ul>
-        </div>
+      <a class="navbar-brand" href="index.html">MSD-Manual-Portable</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="menu.html">Menu</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="search.html">Search</a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="https://github.com/lwd-temp/MSD-Manual-Portable"
+              >About</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" onclick="window.location.href += '?clear=true'"
+              >Refresh</a
+            >
+          </li>
+        </ul>
+      </div>
     </nav>
     <!--Search Button call search()-->
     <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 id="title">Search - Will NOT Work without JavaScript Enabled</h1>
-                <div class="form-group">
-                    <input type="text" id="search" name="search" placeholder="Search">
-                    <button type="submit" class="btn btn-primary" onclick="search()">Search</button>
-                </div>
-            </div>
+      <div class="row">
+        <div class="col-md-12">
+          <h1 id="title">Search - Will NOT Work without JavaScript Enabled</h1>
+          <div class="form-group">
+            <input type="text" id="search" name="search" placeholder="Search" />
+            <button type="submit" class="btn btn-primary" onclick="search()">
+              Search
+            </button>
+          </div>
         </div>
+      </div>
     </div>
     <!--Search Result-->
     <div class="row">
-        <div class="col-md-12">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>TopicTitle</th>
-                        <th>ChapterTitle/RelatedTopicTitle</th>
-                        <th>SectionTitle</th>
-                    </tr>
-                </thead>
-                <tbody id="result">
-                </tbody>
-            </table>
-        </div>
+      <div class="col-md-12">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>TopicTitle</th>
+              <th>ChapterTitle/RelatedTopicTitle</th>
+              <th>SectionTitle</th>
+            </tr>
+          </thead>
+          <tbody id="result"></tbody>
+        </table>
+      </div>
     </div>
     <script>
-        var title = document.getElementById("title");
-        // Load JSON file
-        /**
+      var title = document.getElementById("title");
+      // Load JSON file
+      /**
         title.innerHTML = "Search - Loading Database...";
         var xobj = new XMLHttpRequest();
         xobj.overrideMimeType("application/json");
@@ -206,129 +398,128 @@
         xobj.send(null);
         **/
 
-        // Check if browser supports IndexedDB
-        if (!window.indexedDB) {
-            // Just load the JSON file
-            title.innerHTML = "Search - Loading Database...";
-            var xobj = new XMLHttpRequest();
-            xobj.overrideMimeType("application/json");
-            xobj.open('GET', 'Json/searchcontent.json', true);
-            xobj.onreadystatechange = function () {
-                if (xobj.readyState == 4 && xobj.status == "200") {
-                    window.jsonData = JSON.parse(xobj.responseText);
-                    // window.jsonData is used to set a global variable.
-                    title.innerHTML = "Search - Database Loaded";
-                }
-            };
-            xobj.send(null);
-        } else {
-            // Then we check if the database exists
-            // If it does, we load the read the data from the database
-            // If it doesn't, we load the JSON file and create the database
-            // Key: data, Value: JSON data
-            title.innerHTML = "Search - Checking Database...";
-            var db;
-            var request = window.indexedDB.open("searchcontent", 1);
-            request.onsuccess = function (event) {
-                db = request.result;
-                // We check if the database is empty
-                var transaction = db.transaction(["data"], "readonly");
-                var objectStore = transaction.objectStore("data");
-                var cursor = objectStore.openCursor();
-                cursor.onsuccess = function (event) {
-                    var result = event.target.result;
-                    if (result) {
-                        // If the database is not empty, we load the data from the database
-                        window.jsonData = result.value.data;
-                        title.innerHTML = "Search - Database Loaded";
-                    } else {
-                        // If the database is empty
-                        // Done by onupgradeneeded
-                        // No need to do anything here
-                    }
-                };
-            };
-            request.onupgradeneeded = function (event) {
-                db = event.target.result;
-                var objectStore = db.createObjectStore("data", {
-                    keyPath: "id"
-                });
-                objectStore.createIndex("data", "data", {
-                    unique: false
-                });
-                // Load the data from the JSON file
-                title.innerHTML = "Search - Loading Database...";
-                var xobj = new XMLHttpRequest();
-                xobj.overrideMimeType("application/json");
-                xobj.open('GET', 'Json/searchcontent.json', true);
-                xobj.onreadystatechange = function () {
-                    if (xobj.readyState == 4 && xobj.status == "200") {
-                        var data = JSON.parse(xobj.responseText);
-                        // Add the data to the database
-                        var transaction = db.transaction(["data"], "readwrite");
-                        var objectStore = transaction.objectStore("data");
-                        var request = objectStore.put({
-                            id: "data",
-                            data: data
-                        });
-                        window.jsonData = JSON.parse(xobj.responseText);
-                        // window.jsonData is used to set a global variable.
-                        title.innerHTML = "Search - Database Loaded";
-                    }
-                };
-                xobj.send(null);
-            };
-            request.onerror = function (event) {
-                title.innerHTML = "Search - Database Error";
-                title.innerHTML = "Search - Loading Database...";
-                var xobj = new XMLHttpRequest();
-                xobj.overrideMimeType("application/json");
-                xobj.open('GET', 'Json/searchcontent.json', true);
-                xobj.onreadystatechange = function () {
-                    if (xobj.readyState == 4 && xobj.status == "200") {
-                        window.jsonData = JSON.parse(xobj.responseText);
-                        // window.jsonData is used to set a global variable.
-                        title.innerHTML = "Search - Database Loaded";
-                    }
-                };
-                xobj.send(null);
-            };
-            request.onblocked = function (event) {
-                title.innerHTML = "Search - Database Error";
-                title.innerHTML = "Search - Loading Database...";
-                var xobj = new XMLHttpRequest();
-                xobj.overrideMimeType("application/json");
-                xobj.open('GET', 'Json/searchcontent.json', true);
-                xobj.onreadystatechange = function () {
-                    if (xobj.readyState == 4 && xobj.status == "200") {
-                        window.jsonData = JSON.parse(xobj.responseText);
-                        // window.jsonData is used to set a global variable.
-                        title.innerHTML = "Search - Database Loaded";
-                    }
-                };
-                xobj.send(null);
-            };
-        }
+      // Check if browser supports IndexedDB
+      if (!window.indexedDB) {
+        // Just load the JSON file
+        title.innerHTML = "Search - Loading Database...";
+        var xobj = new XMLHttpRequest();
+        xobj.overrideMimeType("application/json");
+        xobj.open("GET", "Json/searchcontent.json", true);
+        xobj.onreadystatechange = function () {
+          if (xobj.readyState == 4 && xobj.status == "200") {
+            window.jsonData = JSON.parse(xobj.responseText);
+            // window.jsonData is used to set a global variable.
+            title.innerHTML = "Search - Database Loaded";
+          }
+        };
+        xobj.send(null);
+      } else {
+        // Then we check if the database exists
+        // If it does, we load the read the data from the database
+        // If it doesn't, we load the JSON file and create the database
+        // Key: data, Value: JSON data
+        title.innerHTML = "Search - Checking Database...";
+        var db;
+        var request = window.indexedDB.open("searchcontent", 1);
+        request.onsuccess = function (event) {
+          db = request.result;
+          // We check if the database is empty
+          var transaction = db.transaction(["data"], "readonly");
+          var objectStore = transaction.objectStore("data");
+          var cursor = objectStore.openCursor();
+          cursor.onsuccess = function (event) {
+            var result = event.target.result;
+            if (result) {
+              // If the database is not empty, we load the data from the database
+              window.jsonData = result.value.data;
+              title.innerHTML = "Search - Database Loaded";
+            } else {
+              // If the database is empty
+              // Done by onupgradeneeded
+              // No need to do anything here
+            }
+          };
+        };
+        request.onupgradeneeded = function (event) {
+          db = event.target.result;
+          var objectStore = db.createObjectStore("data", {
+            keyPath: "id",
+          });
+          objectStore.createIndex("data", "data", {
+            unique: false,
+          });
+          // Load the data from the JSON file
+          title.innerHTML = "Search - Loading Database...";
+          var xobj = new XMLHttpRequest();
+          xobj.overrideMimeType("application/json");
+          xobj.open("GET", "Json/searchcontent.json", true);
+          xobj.onreadystatechange = function () {
+            if (xobj.readyState == 4 && xobj.status == "200") {
+              var data = JSON.parse(xobj.responseText);
+              // Add the data to the database
+              var transaction = db.transaction(["data"], "readwrite");
+              var objectStore = transaction.objectStore("data");
+              var request = objectStore.put({
+                id: "data",
+                data: data,
+              });
+              window.jsonData = JSON.parse(xobj.responseText);
+              // window.jsonData is used to set a global variable.
+              title.innerHTML = "Search - Database Loaded";
+            }
+          };
+          xobj.send(null);
+        };
+        request.onerror = function (event) {
+          title.innerHTML = "Search - Database Error";
+          title.innerHTML = "Search - Loading Database...";
+          var xobj = new XMLHttpRequest();
+          xobj.overrideMimeType("application/json");
+          xobj.open("GET", "Json/searchcontent.json", true);
+          xobj.onreadystatechange = function () {
+            if (xobj.readyState == 4 && xobj.status == "200") {
+              window.jsonData = JSON.parse(xobj.responseText);
+              // window.jsonData is used to set a global variable.
+              title.innerHTML = "Search - Database Loaded";
+            }
+          };
+          xobj.send(null);
+        };
+        request.onblocked = function (event) {
+          title.innerHTML = "Search - Database Error";
+          title.innerHTML = "Search - Loading Database...";
+          var xobj = new XMLHttpRequest();
+          xobj.overrideMimeType("application/json");
+          xobj.open("GET", "Json/searchcontent.json", true);
+          xobj.onreadystatechange = function () {
+            if (xobj.readyState == 4 && xobj.status == "200") {
+              window.jsonData = JSON.parse(xobj.responseText);
+              // window.jsonData is used to set a global variable.
+              title.innerHTML = "Search - Database Loaded";
+            }
+          };
+          xobj.send(null);
+        };
+      }
     </script>
     <script>
-        // Check URL argument to delete IndexedDB database
-        var url = new URL(window.location.href);
-        var deleteDB = url.searchParams.get("clear");
-        if (deleteDB == "true") {
-            // Delete the database
-            var request = window.indexedDB.deleteDatabase("searchcontent");
-            request.onsuccess = function (event) {
-                //console.log("Database Deleted");
-            };
-            request.onerror = function (event) {
-                //console.log("Database Error");
-            };
-            request.onblocked = function (event) {
-                //console.log("Database Error");
-            };
-            window.location.href = "search.html";
-        }
+      // Check URL argument to delete IndexedDB database
+      var url = new URL(window.location.href);
+      var deleteDB = url.searchParams.get("clear");
+      if (deleteDB == "true") {
+        // Delete the database
+        var request = window.indexedDB.deleteDatabase("searchcontent");
+        request.onsuccess = function (event) {
+          //console.log("Database Deleted");
+        };
+        request.onerror = function (event) {
+          //console.log("Database Error");
+        };
+        request.onblocked = function (event) {
+          //console.log("Database Error");
+        };
+        window.location.href = "search.html";
+      }
     </script>
-</body>
-
+  </body>
 </html>
