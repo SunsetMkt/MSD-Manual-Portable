@@ -153,6 +153,13 @@ def msd_manual_parser(target_dir, dest_dir):
     ) as f:
         f.write(f"searchcontent_callback({compact_dumps(searchcontent)})")
 
+    # Generate Pearls.json
+    print("Generating pearls...")
+    pearls = load_json(os.path.join(target_dir, "Json", "Pearls.json"))
+    # Save to jsonp
+    with open(os.path.join(dest_dir, "pearls_portable.js"), "w", encoding="utf-8") as f:
+        f.write(f"pearls_callback({compact_dumps(pearls)})")
+
     return dest_dir
 
 

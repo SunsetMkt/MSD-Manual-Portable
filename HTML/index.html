@@ -89,6 +89,14 @@
       </div>
     </div>
 
+    <!--Pearls-->
+    <div class="container">
+      <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading" id="pearl-title">Loading</h4>
+        <p id="pearl-content">Loading</p>
+      </div>
+    </div>
+
     <!--Put a warning-like red disclaimer container here-->
     <div class="container">
       <div class="alert alert-danger" role="alert">
@@ -121,7 +129,15 @@
       function version_callback(version) {
         document.getElementById("version").innerHTML = version;
       }
+
+      function pearl_callback(pearls) {
+        // Randomly pick one
+        let i = Math.floor(Math.random() * pearls.length);
+        document.getElementById("pearl-title").innerHTML = pearls[i].Title;
+        document.getElementById("pearl-content").innerHTML = pearls[i].Pearl;
+      }
     </script>
     <script src="version_portable.js"></script>
+    <script src="pearls_portable.js"></script>
   </body>
 </html>
