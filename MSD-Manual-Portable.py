@@ -233,7 +233,7 @@ else:
     print("MSD Manual already downloaded.")
 
 
-if not os.path.exists(os.path.join("unzippedDirName", "index.html")):
+if not os.path.exists(os.path.join(unzippedDirName, "index.html")):
     print("Unpacking MSD Manual...")
     with zipfile.ZipFile(origFilename, "r") as zip_ref:
         zip_ref.extractall(unzippedDirName)
