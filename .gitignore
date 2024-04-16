@@ -143,3 +143,8 @@ MSDProfessionalMedicalTopics.zip.tmp
 
 # But do not ignore start.spec, which is used by PyInstaller to build the executable.
 !MSD-Manual-Portable.spec
+
+# Generated index jsonp
+HTML/version_portable.js
+HTML/index_portable.js
+HTML/searchcontent_portable.js

@@ -8,6 +8,7 @@
 # Download, unpack the MSD Manual, copy HTML files to the portable folder and run a HTTP server.
 import argparse
 import base64
+import hashlib
 import http.server
 import os
 import shutil
@@ -17,9 +18,10 @@ import threading
 import time
 import webbrowser
 import zipfile
+import json
 
 import requests
-from clint.textui import progress
+import tqdm
 
 
 def resource_path(relative_path):
@@ -30,13 +32,11 @@ def resource_path(relative_path):
     return os.path.join(relative_path)
 
 
-def getFilename(url):
-    # return url.split("/")[-1]
+def get_filename(url):
     return os.path.basename(url)
 
 
-def getFilenameWithoutExtension(filename):
-    # return filename.split(".")[0]
+def get_filename_noext(filename):
     return os.path.splitext(filename)[0]
 
 
@@ -61,11 +61,99 @@ def httpd(PORT):
     httpd = http.server.HTTPServer(
         ("localhost", PORT), http.server.SimpleHTTPRequestHandler
     )
-    httpd.serve_forever()
+    return httpd.serve_forever()
 
 
-# Default HTTP Server Port for fallback.
-DEFPORT = 33914  # 33914 is the first five digits of MSD's SHA-256 hash
+def get_latest_version(version="professional", language="zh"):
+    url = "https://api.merck.com/merck-manuals/v1/topicsyncdate"
+    querystring = {"version": str(version), "language": str(language)}
+    headers = {
+        base64.b64decode("WC1NZXJjay1BUElLZXk=")
+        .decode("utf-8"): base64.b64decode(
+            "VVZ6NGI0dDRON3pjT0wyMGh2VVpNc1o5dU1mUzZqYXg="
+        )
+        .decode("utf-8")
+    }
+    response = requests.get(url, headers=headers, params=querystring)
+    return response.json()["TopicSyncDate"]
+
+
+def short_hash(string):
+    return hashlib.sha256(string.encode("utf-8")).hexdigest()[:5]
+
+
+def construct_filename(version="professional", language="zh"):
+    if language == "en":
+        language = ""
+    else:
+        language = language.upper()
+
+    version = version[0].upper() + version[1:]
+
+    # MSDZHProfessionalMedicalTopics.zip
+    return f"MSD{language}{version}MedicalTopics.zip"
+
+
+def stream_download(url, path):
+    r = requests.get(url, stream=True)
+    with open(path, "wb") as f:
+        total_length = int(r.headers.get("content-length"))
+        # tqdm
+        for chunk in tqdm.tqdm(
+            r.iter_content(chunk_size=1024),
+            total=total_length / 1024 + 1,
+            desc=get_filename(url),
+        ):
+            if chunk:
+                f.write(chunk)
+                f.flush()
+    print(f"Download complete: {url}")
+    return path
+
+
+def compact_dumps(obj):
+    return json.dumps(obj, separators=(",", ":"), indent=None)
+
+
+def load_json(path):
+    return json.load(open(path))
+
+
+def msd_manual_parser(target_dir, dest_dir):
+    # Get curr version
+    print("Getting current version...")
+    try:
+        curr_version = get_latest_version()
+    except:
+        curr_version = "unknown"
+    # Save to jsonp
+    with open(
+        os.path.join(dest_dir, "version_portable.js"), "w", encoding="utf-8"
+    ) as f:
+        f.write(f"version_callback({compact_dumps(curr_version)})")
+
+    # Generate index
+    print("Generating index...")
+    index = load_json(os.path.join(target_dir, "Json", "sections.json"))
+    for section in index["sections"]:
+        chapters = load_json(
+            os.path.join(target_dir, "Json", section["SectionId"] + ".json")
+        )
+        section["chapters"] = chapters["chapters"]
+    # Save to jsonp
+    with open(os.path.join(dest_dir, "index_portable.js"), "w", encoding="utf-8") as f:
+        f.write(f"index_callback({compact_dumps(index)})")
+
+    # Generate searchcontent
+    print("Generating searchcontent...")
+    searchcontent = load_json(os.path.join(target_dir, "Json", "searchcontent.json"))
+    # Save to jsonp
+    with open(
+        os.path.join(dest_dir, "searchcontent_portable.js"), "w", encoding="utf-8"
+    ) as f:
+        f.write(f"searchcontent_callback({compact_dumps(searchcontent)})")
+
+    return dest_dir
 
 
 # argparse
@@ -80,7 +168,7 @@ parser.add_argument(
     "--lang",
     default="zh",
     choices=["en", "zh"],
-    help="Language of the MSD Manual. Default: zh",
+    help="Language of the MSD Manual.",
 )
 # version: professional consumer
 parser.add_argument(
@@ -88,145 +176,96 @@ parser.add_argument(
     "--version",
     default="professional",
     choices=["professional", "consumer"],
-    help="Version of the MSD Manual. Default: professional",
+    help="Version of the MSD Manual.",
 )
-# port: any integer, default: PORT
+# port: 1-65535 integer, default: PORT
 parser.add_argument(
     "-p",
     "--port",
-    default=DEFPORT,
+    default=33914,  # 33914 is the first five digits of "MSD"'s SHA-256 hash
     type=int,
-    help="Port of the HTTP Server. Default port changes for different languages and versions.",
+    help="Port of the HTTP Server, 1-65535.",
 )
-# silent: do not open browser
-parser.add_argument("-s", "--silent", action="store_true", help="Do not open browser.")
-
+# silent: do not do anything after building
+parser.add_argument(
+    "-s",
+    "--silent",
+    action="store_true",
+    help="Do not do anything after building.",
+)
 args = parser.parse_args()
 
-# Set PORT
-PORT = args.port
 
 # Download the MSD Manual
-baseURL = "https://mmcdnprdcontent.azureedge.net/"
-if args.version == "professional":
-    if args.lang == "en":
-        filename = "MSDProfessionalMedicalTopics.zip"
-        if PORT == DEFPORT:
-            PORT = DEFPORT
-    else:
-        filename = "MSDZHProfessionalMedicalTopics.zip"
-        if PORT == DEFPORT:
-            PORT = DEFPORT + 100
-elif args.version == "consumer":
-    if args.lang == "en":
-        filename = "MSDConsumerMedicalTopics.zip"
-        if PORT == DEFPORT:
-            PORT = DEFPORT + 200
-    else:
-        filename = "MSDZHConsumerMedicalTopics.zip"
-        if PORT == DEFPORT:
-            PORT = DEFPORT + 300
-else:
-    print("Error: Invalid version.")
-    sys.exit(1)
 
-url = baseURL + filename
+# Pre-Config
+zipURL = f"https://mmcdnprdcontent.azureedge.net/{construct_filename(args.version, args.lang)}"
+origFilename = get_filename(zipURL)
+pureFilename = get_filename_noext(origFilename)
+tmpFilename = f"{origFilename}.tmp"
+unzippedDirName = pureFilename
 
 if not (
-    os.path.exists(getFilename(url))
-    or os.path.exists(getFilenameWithoutExtension(getFilename(url)))
+    os.path.exists(origFilename)
+    or os.path.exists(os.path.join("unzippedDirName", "index.html"))
 ):
     print("Downloading MSD Manual...")
-    r = requests.get(url, stream=True)
-    path = getFilename(url) + ".tmp"
-    with open(path, "wb") as f:
-        total_length = int(r.headers.get("content-length"))
-        for chunk in progress.bar(
-            r.iter_content(chunk_size=1024), expected_size=(total_length / 1024) + 1
-        ):
-            if chunk:
-                f.write(chunk)
-                f.flush()
-    print("Download complete.")
+    downloadedPath = stream_download(zipURL, tmpFilename)
     # Rename the downloaded file
-    os.rename(path, getFilename(url))
+    os.rename(downloadedPath, origFilename)
 
     # Try getting favicon.ico
     favicon = "https://www.msdmanuals.com/favicon.ico"
     print("Downloading favicon.ico...")
     try:
-        r = requests.get(favicon)
-        with open(resource_path(os.path.join("HTML", "favicon.ico")), "wb") as f:
-            f.write(r.content)
-        print("Download complete.")
+        stream_download(favicon, resource_path(os.path.join("HTML", "favicon.ico")))
     except:
         print("Failed to get favicon.ico.")
         print("This is not necessarily a problem.")
-        pass
 else:
     print("MSD Manual already downloaded.")
 
 
-if not os.path.exists(getFilenameWithoutExtension(getFilename(url))):
-    # Unpack the MSD Manual to MSDZHProfessionalMedicalTopics folder
-    path = getFilename(url)
+if not os.path.exists(os.path.join("unzippedDirName", "index.html")):
     print("Unpacking MSD Manual...")
-    with zipfile.ZipFile(path, "r") as zip_ref:
-        zip_ref.extractall(getFilenameWithoutExtension(getFilename(url)))
+    with zipfile.ZipFile(origFilename, "r") as zip_ref:
+        zip_ref.extractall(unzippedDirName)
     print("Unpacking complete.")
-    print(
-        getFilename(url)
-        + " can be removed manually without affecting the portable MSD Manual."
-    )
 
-    # Copy the HTML files to the folder
-    print("Copying HTML files to the folder...")
+    msd_manual_parser(unzippedDirName, resource_path("HTML"))
+
+    # Copy index files to the folder
+    print("Copying index files to the folder...")
     # Copy all files in HTML folder to the folder
     for file in os.listdir(resource_path("HTML")):
-        shutil.copy(
-            resource_path(os.path.join("HTML", file)),
-            getFilenameWithoutExtension(getFilename(url)),
-        )
+        shutil.copy(resource_path(os.path.join("HTML", file)), unzippedDirName)
     print("Copying complete.")
 else:
     print("MSD Manual already unpacked.")
 
+if args.silent:
+    sys.exit()
 
 # Change the current working directory to the folder
-print(
-    "Changing the current working directory to "
-    + getFilenameWithoutExtension(getFilename(url))
-    + "..."
-)
-os.chdir(getFilenameWithoutExtension(getFilename(url)))
+os.chdir(unzippedDirName)
 
 
 # Run the HTTP server
 print("Starting the HTTP server...")
 
 # Start server and open browser
-PORT = check_port_available(PORT)
-server = threading.Thread(target=httpd, args=(PORT,))
-server.daemon = True
+PORT = check_port_available(args.port)
+server = threading.Thread(target=httpd, args=(PORT,), daemon=True)
 server.start()
-print("The HTTP server is running on localhost:" + str(PORT) + "...")
-print(
-    "You can now open the MSD Manual in your browser at http://localhost:"
-    + str(PORT)
-    + "/"
-)
+print(f"The HTTP server is running on localhost:{PORT}...")
+print(f"You can now open the MSD Manual in your browser at http://localhost:{PORT}/")
 print("Press Ctrl+C to stop the server.")
-if not args.silent:
-    webbrowser.open("http://localhost:" + str(PORT))
 
-# Ctrl+C to stop the server
+webbrowser.open(f"http://localhost:{PORT}")
+
+# Ctrl+C to exit
 try:
     while True:
         time.sleep(100)  # sleep to avoid performance issues
 except KeyboardInterrupt:
-    sys.exit()
-except Exception as e:
-    print(e)
-    sys.exit()
-finally:
     sys.exit()
