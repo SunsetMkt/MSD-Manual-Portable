@@ -63,7 +63,7 @@
           A method to build a portable and offline-available MSD Manual.
         </p>
         <hr class="my-4" />
-        <p>This is the home page of the MSD-Manual-Portable.</p>
+        <p>This is the home page of your portable MSD Manual.</p>
         <p>
           <a href="https://www.msdmanuals.com/professional"
             >The Merck Manual of Diagnosis and Therapy</a
@@ -72,10 +72,11 @@
           language medical textbook.
         </p>
         <p>
-          This project contains a mirror of The Merck Manual of Diagnosis and
+          This folder contains a mirror of The Merck Manual of Diagnosis and
           Therapy. This project is not affiliated with Merck & Co, Inc., Rahway,
           NJ,USA.
         </p>
+        <p>Datapack build date: <span id="version">unknown</span></p>
         <!--two buttons to menu and search-->
         <p>
           <a class="btn btn-primary btn-lg" href="menu.html" role="button"
@@ -116,5 +117,11 @@
         </p>
       </div>
     </div>
+    <script>
+      function version_callback(version) {
+        document.getElementById("version").innerHTML = version;
+      }
+    </script>
+    <script src="version_portable.js"></script>
   </body>
 </html>

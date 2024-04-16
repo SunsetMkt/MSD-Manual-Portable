@@ -10,6 +10,7 @@ import argparse
 import base64
 import hashlib
 import http.server
+import json
 import os
 import shutil
 import socket
@@ -18,7 +19,6 @@ import threading
 import time
 import webbrowser
 import zipfile
-import json
 
 import requests
 import tqdm

@@ -5,7 +5,7 @@
     https://github.com/lwd-temp/MSD-Manual-Portable
 
     Menu Page
-    Read from JSON file and display the menu.
+    Load index from prebuilt jsonp.
 -->
 <html lang="en">
   <head>
@@ -84,114 +84,6 @@
     <script>
       var title = document.getElementById("title");
 
-      function loadJSON(url) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", url, false);
-        xhr.send(null);
-        if (xhr.status == 200) {
-          return JSON.parse(xhr.responseText);
-        }
-        return null;
-      }
-
-      function loadIndex(callback) {
-        // Load
-        title.innerHTML = "Menu - Loading index...";
-
-        // Index
-        var index;
-
-        // Load sections from JSON file
-        var sections = loadJSON("Json/sections.json");
-        var index = sections;
-        // for each section
-        for (var i = 0; i < index.sections.length; i++) {
-          uuid = index.sections[i].SectionId;
-          // Then we load the chapters from the JSON file
-          var chapters = loadJSON("Json/" + uuid + ".json");
-          // Then we append the chapters to the index
-          index.sections[i].chapters = chapters.chapters;
-        }
-
-        title.innerHTML = "Menu - Index loaded";
-
-        window.indexdata = index;
-
-        callback(index);
-        // Return index
-        return index;
-      }
-
-      // Check if browser supports IndexedDB
-      if (!window.indexedDB) {
-        loadIndex(function (index) {
-          geneIndex(index);
-        });
-      } else {
-        // Then we check if the database exists
-        // If it does, we load the read the data from the database
-        // If it doesn't, we load the JSON file and create the database
-        // Key: data, Value: JSON data
-        title.innerHTML = "Menu - Checking Database...";
-        var db;
-        var request = window.indexedDB.open("indexdata", 1);
-        request.onsuccess = function (event) {
-          db = request.result;
-          // We check if the database is empty
-          var transaction = db.transaction(["data"], "readonly");
-          var objectStore = transaction.objectStore("data");
-          var cursor = objectStore.openCursor();
-          cursor.onsuccess = function (event) {
-            var result = event.target.result;
-            if (result) {
-              // If the database is not empty, we load the data from the database
-              window.indexdata = result.value.data;
-              title.innerHTML = "Menu - Database Loaded";
-              geneIndex(window.indexdata);
-            } else {
-              // If the database is empty
-              // Done by onupgradeneeded
-              // No need to do anything here
-            }
-          };
-          title.innerHTML = "Menu - Database Loaded";
-        };
-        request.onupgradeneeded = function (event) {
-          db = event.target.result;
-          var objectStore = db.createObjectStore("data", {
-            keyPath: "id",
-          });
-          objectStore.createIndex("data", "data", {
-            unique: false,
-          });
-          loadIndex(function (index) {
-            objectStore.transaction.oncomplete = function (event) {
-              var transaction = db.transaction(["data"], "readwrite");
-              var objectStore = transaction.objectStore("data");
-              objectStore.put({
-                id: "data",
-                data: index,
-              });
-              geneIndex(index);
-            };
-          });
-        };
-        request.onerror = function (event) {
-          title.innerHTML = "Menu - Database Error";
-          title.innerHTML = "Menu - Loading Database...";
-          loadIndex(function (index) {
-            geneIndex(index);
-          });
-        };
-        request.onblocked = function (event) {
-          title.innerHTML = "Menu - Database Error";
-          title.innerHTML = "Menu - Loading Database...";
-          loadIndex(function (index) {
-            geneIndex(index);
-          });
-        };
-      }
-
       // Generate the index
       function geneIndex(index) {
         title.innerHTML = "Menu - Generating Index...";
@@ -232,23 +124,14 @@
       }
     </script>
     <script>
-      // Check URL argument to delete IndexedDB database
-      var url = new URL(window.location.href);
-      var deleteDB = url.searchParams.get("clear");
-      if (deleteDB == "true") {
-        // Delete the database
-        var request = window.indexedDB.deleteDatabase("indexdata");
-        request.onsuccess = function (event) {
-          //console.log("Database Deleted");
-        };
-        request.onerror = function (event) {
-          //console.log("Database Error");
-        };
-        request.onblocked = function (event) {
-          //console.log("Database Error");
-        };
-        window.location.href = "menu.html";
+      function index_callback(index) {
+        geneIndex(index);
       }
+      title.innerHTML = "Menu - Loading Index...";
+    </script>
+    <script src="index_portable.js"></script>
+    <script>
+      title.innerHTML = "Menu";
     </script>
   </body>
 </html>
