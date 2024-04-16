@@ -116,7 +116,7 @@ def compact_dumps(obj):
 
 
 def load_json(path):
-    return json.load(open(path))
+    return json.load(open(path, encoding="utf-8-sig"))
 
 
 def msd_manual_parser(target_dir, dest_dir):
