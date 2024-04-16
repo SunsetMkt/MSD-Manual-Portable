@@ -97,7 +97,10 @@ def construct_filename(version="professional", language="zh"):
 def stream_download(url, path):
     r = requests.get(url, stream=True)
     with open(path, "wb") as f:
-        total_length = int(r.headers.get("content-length"))
+        try:
+            total_length = int(r.headers.get("content-length"))
+        except:
+            total_length = None
         # tqdm
         for chunk in tqdm.tqdm(
             r.iter_content(chunk_size=1024),
@@ -107,6 +110,14 @@ def stream_download(url, path):
             if chunk:
                 f.write(chunk)
                 f.flush()
+    print(f"Download complete: {url}")
+    return path
+
+
+def simple_download(url, path):
+    r = requests.get(url)
+    with open(path, "wb") as f:
+        f.write(r.content)
     print(f"Download complete: {url}")
     return path
 
@@ -220,15 +231,6 @@ if not (
     downloadedPath = stream_download(zipURL, tmpFilename)
     # Rename the downloaded file
     os.rename(downloadedPath, origFilename)
-
-    # Try getting favicon.ico
-    favicon = "https://www.msdmanuals.com/favicon.ico"
-    print("Downloading favicon.ico...")
-    try:
-        stream_download(favicon, resource_path(os.path.join("HTML", "favicon.ico")))
-    except:
-        print("Failed to get favicon.ico.")
-        print("This is not necessarily a problem.")
 else:
     print("MSD Manual already downloaded.")
 
@@ -238,6 +240,14 @@ if not os.path.exists(os.path.join(unzippedDirName, "index.html")):
     with zipfile.ZipFile(origFilename, "r") as zip_ref:
         zip_ref.extractall(unzippedDirName)
     print("Unpacking complete.")
+
+    # Try getting favicon.ico
+    favicon = "https://www.msdmanuals.com/favicon.ico"
+    print("Downloading favicon.ico...")
+    try:
+        simple_download(favicon, resource_path(os.path.join("HTML", "favicon.ico")))
+    except:
+        pass
 
     msd_manual_parser(unzippedDirName, resource_path("HTML"))
 
