@@ -15,7 +15,7 @@
     Images - TopicUrl，需要去除`https://www.msdmanuals.cn/`或`https://www.msdmanuals.com/`实现本地访问
     Figures - TopicUrl，需要去除`https://www.msdmanuals.cn/`或`https://www.msdmanuals.com/`实现本地访问
     3D Models - TopicUrl
-    Videos - https://players.brightcove.net/3850378299001/default_default/index.html?videoId=RelatedTopicId
+    Videos - https://players.brightcove.net/3850378299001/default_default/index.html?videoId=videoId
 -->
 <html lang="en">
   <head>
@@ -285,7 +285,7 @@
               searchresulthtml += "<tr>";
               searchresulthtml +=
                 "<td><a href='https://players.brightcove.net/3850378299001/default_default/index.html?videoId=" +
-                nullHandler(data[i].TopicId) +
+                nullHandler(data[i].videoId) +
                 "'>" +
                 nullHandler(data[i].TopicTitle) +
                 "</a></td>";
