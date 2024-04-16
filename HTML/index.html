@@ -92,8 +92,8 @@
     <!--Pearls-->
     <div class="container">
       <div class="alert alert-info" role="alert">
-        <h4 class="alert-heading" id="pearl-title">Loading</h4>
-        <p id="pearl-content">Loading</p>
+        <h4 class="alert-heading" id="pearl-title">Loading Pearls</h4>
+        <p id="pearl-content">Loading Pearls</p>
       </div>
     </div>
 
@@ -130,7 +130,7 @@
         document.getElementById("version").innerHTML = version;
       }
 
-      function pearl_callback(pearls) {
+      function pearls_callback(pearls) {
         // Randomly pick one
         let i = Math.floor(Math.random() * pearls.length);
         document.getElementById("pearl-title").innerHTML = pearls[i].Title;
