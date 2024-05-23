@@ -18,7 +18,7 @@ $ python3 MSD-Manual-Portable.py
 ## usage
 
 ```shell
-usage: MSD-Manual-Portable.py [-h] [-l {en,zh}] [-v {professional,consumer}] [-p PORT] [-s]
+usage: MSD-Manual-Portable.py [-h] [-l {en,zh}] [-v {professional,consumer}] [-p PORT] [-s] [--vet]
 
 Host a portable and offline-available MSD Manual.
 
@@ -30,6 +30,7 @@ options:
                         Version of the MSD Manual.
   -p PORT, --port PORT  Port of the HTTP Server, 1-65535.
   -s, --silent          Do not do anything after building.
+  --vet                 Download the vet version (English only) and ignore version and lang argument.
 ```
 
 ## 关于《默沙东诊疗手册》
