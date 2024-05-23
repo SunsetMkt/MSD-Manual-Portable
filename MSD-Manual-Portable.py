@@ -164,12 +164,15 @@ def msd_manual_parser(target_dir, dest_dir):
     ) as f:
         f.write(f"searchcontent_callback({compact_dumps(searchcontent)})")
 
-    # Generate Pearls.json
-    print("Generating pearls...")
-    pearls = load_json(os.path.join(target_dir, "Json", "Pearls.json"))
-    # Save to jsonp
-    with open(os.path.join(dest_dir, "pearls_portable.js"), "w", encoding="utf-8") as f:
-        f.write(f"pearls_callback({compact_dumps(pearls)})")
+    if not args.vet:
+        # Generate Pearls.json
+        print("Generating pearls...")
+        pearls = load_json(os.path.join(target_dir, "Json", "Pearls.json"))
+        # Save to jsonp
+        with open(
+            os.path.join(dest_dir, "pearls_portable.js"), "w", encoding="utf-8"
+        ) as f:
+            f.write(f"pearls_callback({compact_dumps(pearls)})")
 
     return dest_dir
 
@@ -211,13 +214,23 @@ parser.add_argument(
     action="store_true",
     help="Do not do anything after building.",
 )
+# vet: download the vet version MSDVetMedicalTopics.zip
+parser.add_argument(
+    "--vet",
+    action="store_true",
+    help="Download the vet version (English only) and ignore version and lang argument.",
+)
 args = parser.parse_args()
 
 
 # Download the MSD Manual
 
 # Pre-Config
-zipURL = f"https://mmcdnprdcontent.azureedge.net/{construct_filename(args.version, args.lang)}"
+if not args.vet:
+    zipURL = f"https://mmcdnprdcontent.azureedge.net/{construct_filename(args.version, args.lang)}"
+else:
+    # zipURL = f"https://mmcdnprdvet.azureedge.net/{construct_filename('vet', args.lang)}"  # MSDVetMedicalTopics.zip
+    zipURL = "https://mmcdnprdcontent.azureedge.net/MSDVetMedicalTopics.zip"
 origFilename = get_filename(zipURL)
 pureFilename = get_filename_noext(origFilename)
 tmpFilename = f"{origFilename}.tmp"
