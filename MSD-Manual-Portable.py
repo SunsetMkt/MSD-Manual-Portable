@@ -177,6 +177,25 @@ def msd_manual_parser(target_dir, dest_dir):
     return dest_dir
 
 
+def extract_zip_file(origFilename, unzippedDirName):
+    with zipfile.ZipFile(origFilename, "r") as zip_ref:
+        for member in zip_ref.infolist():
+            # Replace backslashes with forward slashes
+            member_path = member.filename.replace("\\", "/")
+            target_path = os.path.join(unzippedDirName, member_path)
+
+            print(f"Extracting {target_path}")
+
+            # Create target directories if they don't exist
+            if not os.path.exists(os.path.dirname(target_path)):
+                os.makedirs(os.path.dirname(target_path))
+
+            # Extract the file
+            if not member.is_dir():
+                with zip_ref.open(member) as source, open(target_path, "wb") as target:
+                    shutil.copyfileobj(source, target)
+
+
 # argparse
 parser = argparse.ArgumentParser(
     # prog='MSD-Manual-Portable',
@@ -250,8 +269,9 @@ else:
 
 if not os.path.exists(os.path.join(unzippedDirName, "index.html")):
     print("Unpacking MSD Manual...")
-    with zipfile.ZipFile(origFilename, "r") as zip_ref:
-        zip_ref.extractall(unzippedDirName)
+    # with zipfile.ZipFile(origFilename, "r") as zip_ref:
+    #     zip_ref.extractall(unzippedDirName)
+    extract_zip_file(origFilename, unzippedDirName)
     print("Unpacking complete.")
 
     # Try getting favicon.ico
