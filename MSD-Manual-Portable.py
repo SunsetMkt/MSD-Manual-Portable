@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # MSD-Manual-Portable
 # A method to build a portable and offline-available MSD Manual.
-# https://github.com/lwd-temp/MSD-Manual-Portable
+# https://github.com/SunsetMkt/MSD-Manual-Portable
 #
 # MSD-Manual-Portable.py
 # Download, unpack the MSD Manual, copy HTML files to the portable folder and run a HTTP server.
@@ -200,7 +200,7 @@ def extract_zip_file(origFilename, unzippedDirName):
 parser = argparse.ArgumentParser(
     # prog='MSD-Manual-Portable',
     description="Host a portable and offline-available MSD Manual.",
-    epilog="https://github.com/lwd-temp/MSD-Manual-Portable",
+    epilog="https://github.com/SunsetMkt/MSD-Manual-Portable",
 )
 # lang: en zh
 parser.add_argument(
