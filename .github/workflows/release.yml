@@ -1,52 +1,43 @@
 name: Release Packed Application
 
 on:
-  push:
-    # Sequence of patterns matched against refs/tags
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+    push:
+        # Sequence of patterns matched against refs/tags
+        tags:
+            - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+
+permissions:
+    contents: write
 
 jobs:
-  build:
+    build:
+        runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
 
-    steps:
-      - uses: actions/checkout@v2
+            - name: Package Application
+              uses: JackMcKew/pyinstaller-action-windows@6736e82336143ca2eb15d13f9b1af90dfd945042
+              with:
+                  path: .
 
-      - name: Package Application
-        uses: JackMcKew/pyinstaller-action-windows@main
-        with:
-          path: .
+            - name: Copy LICENSE.txt to dist
+              run: cp LICENSE dist/windows/LICENSE.txt
 
-      - name: Copy LICENSE.txt to dist
-        run: cp LICENSE dist/windows/LICENSE.txt
+            - name: Upload Artifact
+              uses: actions/upload-artifact@v6
+              with:
+                  name: dist-windows
+                  path: dist/windows
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: MSD-Manual-Portable
-          path: dist/windows
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          body: |
-            ${{ github.ref }} View README for more information.
-          draft: false
-          prerelease: false
-
-      - uses: xresloader/upload-to-github-release@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          file: "dist/windows/*.exe"
-          release_id: ${{ steps.create_release.outputs.id }}
-          overwrite: true
-          verbose: true
-          draft: false
+            - name: Create release
+              uses: ncipollo/release-action@v1.20.0
+              with:
+                  artifacts: "dist/windows/*.exe"
+                  tag: "${{ github.ref }}"
+                  name: "${{ github.ref }}"
+                  body: "${{ github.ref }}"
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  draft: false
+                  allowUpdates: false
+                  makeLatest: true
