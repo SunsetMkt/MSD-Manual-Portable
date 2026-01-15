@@ -18,6 +18,29 @@
         <link rel="stylesheet" href="bootstrap.min.css" />
         <script src="jquery.min.js"></script>
         <script src="bootstrap.bundle.min.js"></script>
+        <style>
+            /* Custom styles for interaction */
+            #pearl-container {
+                transition: background-color 0.2s;
+                position: relative;
+            }
+            #pearl-container.clickable {
+                cursor: pointer;
+            }
+            #pearl-container.clickable:hover {
+                background-color: #d1ecf1; /* Slightly darker alert-info color */
+            }
+            #pearl-container.clickable:active {
+                background-color: #c6e0f5;
+            }
+            .click-hint {
+                font-size: 0.8rem;
+                opacity: 0.7;
+                margin-top: 10px;
+                text-align: right;
+                display: none; /* Hidden by default until data loads */
+            }
+        </style>
     </head>
 
     <body>
@@ -97,15 +120,22 @@
             </div>
         </div>
 
-        <!--Pearls-->
+        <!--Pearls Section-->
         <div class="container">
-            <div class="alert alert-info" role="alert">
-                <h4 class="alert-heading" id="pearl-title">Loading Pearls</h4>
-                <p id="pearl-content">Loading Pearls</p>
+            <!-- Added ID 'pearl-container' for JS manipulation -->
+            <div class="alert alert-info" role="alert" id="pearl-container">
+                <h4 class="alert-heading" id="pearl-title">
+                    Loading Pearls...
+                </h4>
+                <p id="pearl-content">Please wait...</p>
+                <!-- Added a hint text -->
+                <div id="pearl-hint" class="click-hint">
+                    Click box to refresh content
+                </div>
             </div>
         </div>
 
-        <!--Put a warning-like red disclaimer container here-->
+        <!--Disclaimer-->
         <div class="container">
             <div class="alert alert-danger" role="alert">
                 <h4 class="alert-heading">Disclaimer</h4>
@@ -136,21 +166,85 @@
                 </p>
             </div>
         </div>
+
         <script>
+            // Data storage
+            var loadedPearlsData = [];
+
+            /**
+             * Callback for version info
+             */
             function version_callback(version) {
-                document.getElementById("version").innerHTML = version;
+                var vSpan = document.getElementById("version");
+                if (vSpan) {
+                    vSpan.textContent = version || "Unknown";
+                }
             }
 
-            function pearls_callback(pearls) {
+            /**
+             * Function to render a random pearl
+             * Separated from the callback to allow manual triggering
+             */
+            function renderRandomPearl() {
+                if (!loadedPearlsData || loadedPearlsData.length === 0) return;
+
                 // Randomly pick one
-                let i = Math.floor(Math.random() * pearls.length);
-                document.getElementById("pearl-title").innerHTML =
-                    pearls[i].Title;
-                document.getElementById("pearl-content").innerHTML =
-                    pearls[i].Pearl;
+                var i = Math.floor(Math.random() * loadedPearlsData.length);
+                var item = loadedPearlsData[i];
+
+                if (item) {
+                    document.getElementById("pearl-title").innerHTML =
+                        item.Title || "No Title";
+                    document.getElementById("pearl-content").innerHTML =
+                        item.Pearl || "No Content";
+                }
+            }
+
+            /**
+             * Callback for Pearls data loading
+             */
+            function pearls_callback(pearls) {
+                // Validation: Check if pearls is a valid array
+                if (Array.isArray(pearls) && pearls.length > 0) {
+                    loadedPearlsData = pearls;
+
+                    // Render the first random pearl
+                    renderRandomPearl();
+
+                    // Enable interactivity
+                    var container = document.getElementById("pearl-container");
+                    var hint = document.getElementById("pearl-hint");
+
+                    if (container) {
+                        container.classList.add("clickable");
+                        container.onclick = function () {
+                            renderRandomPearl();
+                        };
+                        container.setAttribute(
+                            "title",
+                            "Click to show another pearl"
+                        );
+                    }
+
+                    if (hint) {
+                        hint.style.display = "block";
+                    }
+                } else {
+                    // Fallback if data is empty or invalid
+                    document.getElementById("pearl-title").textContent = "Info";
+                    document.getElementById("pearl-content").textContent =
+                        "No Clinical Pearls available at this time.";
+                }
             }
         </script>
-        <script src="version_portable.js"></script>
-        <script src="pearls_portable.js"></script>
+        <!-- Load scripts at the end -->
+        <script
+            src="version_portable.js"
+            onerror="document.getElementById('version').innerHTML='Error loading version'"
+        ></script>
+        <script
+            src="pearls_portable.js"
+            onerror="document.getElementById('pearl-content').innerHTML='Error loading data file'"
+        ></script>
     </body>
 </html>

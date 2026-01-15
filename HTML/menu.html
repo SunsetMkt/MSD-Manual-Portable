@@ -18,6 +18,43 @@
         <link rel="stylesheet" href="bootstrap.min.css" />
         <script src="jquery.min.js"></script>
         <script src="bootstrap.bundle.min.js"></script>
+        <style>
+            /* Optimization for mobile viewing */
+            .chapter-title {
+                font-weight: bold;
+                margin-top: 15px;
+                margin-bottom: 5px;
+                color: #495057;
+                padding-left: 10px;
+                border-left: 4px solid #007bff;
+            }
+            .topic-list {
+                padding-left: 0;
+                list-style: none;
+            }
+            .topic-item {
+                display: block;
+                padding: 8px 15px;
+                border-bottom: 1px solid #eee;
+                color: #212529;
+                text-decoration: none;
+                transition: background-color 0.2s;
+            }
+            .topic-item:hover {
+                background-color: #f8f9fa;
+                text-decoration: none;
+                color: #0056b3;
+            }
+            .filter-container {
+                margin-bottom: 20px;
+            }
+            /* Visual feedback for loading */
+            #loading-spinner {
+                display: none;
+                text-align: center;
+                margin: 20px 0;
+            }
+        </style>
     </head>
 
     <body>
@@ -56,90 +93,184 @@
             </div>
         </nav>
         <br />
-        <!--Table of Content-->
+
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <h1 id="title">
-                        Menu - Will NOT Work without JavaScript Enabled
-                    </h1>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">Section</th>
-                                <th scope="col">Chapter</th>
-                                <th scope="col">Topic</th>
-                            </tr>
-                        </thead>
-                        <tbody id="menu">
-                            <tr>
-                                <td>SectionTitle</td>
-                                <td>ChapterTitle</td>
-                                <td>TopicTitle</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <h1 id="page-title">Menu</h1>
+
+                    <!-- Filter Input -->
+                    <div class="filter-container">
+                        <input
+                            type="text"
+                            id="menu-filter"
+                            class="form-control form-control-lg"
+                            placeholder="Type to filter sections, chapters or topics..."
+                            disabled
+                        />
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="loading-message" class="alert alert-info">
+                        Loading Index Data... Please wait.
+                    </div>
+
+                    <!-- Error State (Hidden by default) -->
+                    <div
+                        id="error-message"
+                        class="alert alert-danger"
+                        style="display: none"
+                    >
+                        Error loading index data. Please ensure
+                        <code>index_portable.js</code> exists.
+                    </div>
+
+                    <!-- Accordion Container -->
+                    <div class="accordion" id="menu-accordion">
+                        <!-- Content will be injected here -->
+                    </div>
                 </div>
             </div>
         </div>
-        <!--End of Table of Content-->
-        <script>
-            var title = document.getElementById("title");
 
-            // Generate the index
+        <script>
+            // Elements
+            const titleEl = document.getElementById("page-title");
+            const menuContainer = document.getElementById("menu-accordion");
+            const loadingEl = document.getElementById("loading-message");
+            const errorEl = document.getElementById("error-message");
+            const filterInput = document.getElementById("menu-filter");
+
+            // Cache for filter function
+            let originalItems = [];
+
+            /**
+             * Generates the HTML structure from JSON data
+             * Optimizations: Uses array.push() instead of string concatenation, uses Bootstrap Accordion.
+             */
             function geneIndex(index) {
-                title.innerHTML = "Menu - Generating Index...";
-                indexhtml = "";
-                // For each section
-                for (var i = 0; i < index.sections.length; i++) {
-                    // We add the section title with h5
-                    indexhtml +=
-                        "<tr><td colspan='3'><h5>" +
-                        index.sections[i].DisplayTitle +
-                        "</h5></td></tr>";
-                    // Then we add the chapters with a
-                    for (
-                        var j = 0;
-                        j < index.sections[i].chapters.length;
-                        j++
-                    ) {
-                        indexhtml +=
-                            "<tr><td></td><td><a href='" +
-                            index.sections[i].chapters[j].ChapterId +
-                            ".html'>" +
-                            index.sections[i].chapters[j].DisplayTitle +
-                            "</a></td><td></td></tr>";
-                        // Then we add the topics with a
-                        for (
-                            var k = 0;
-                            k < index.sections[i].chapters[j].Topics.length;
-                            k++
-                        ) {
-                            indexhtml +=
-                                "<tr><td></td><td></td><td><a href='" +
-                                index.sections[i].chapters[j].Topics[k]
-                                    .TopicId +
-                                ".html'>" +
-                                index.sections[i].chapters[j].Topics[k]
-                                    .DisplayTitle +
-                                "</a></td></tr>";
-                        }
-                    }
+                // Validation
+                if (
+                    !index ||
+                    !index.sections ||
+                    !Array.isArray(index.sections)
+                ) {
+                    showError();
+                    return;
                 }
 
-                document.getElementById("menu").innerHTML = indexhtml;
-                title.innerHTML = "Menu - Index Generated";
+                titleEl.textContent = "Menu - Generating View...";
+
+                // Use a document fragment or huge string array for better performance
+                let htmlParts = [];
+
+                index.sections.forEach((section, sIndex) => {
+                    const sectionId = `section-${sIndex}`;
+                    const headerId = `header-${sIndex}`;
+
+                    // Accordion Item (Card)
+                    htmlParts.push(`
+                        <div class="card section-card">
+                            <div class="card-header" id="${headerId}">
+                                <h2 class="mb-0">
+                                    <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#${sectionId}" aria-expanded="false" aria-controls="${sectionId}">
+                                        ${section.DisplayTitle}
+                                    </button>
+                                </h2>
+                            </div>
+
+                            <div id="${sectionId}" class="collapse" aria-labelledby="${headerId}" data-parent="#menu-accordion">
+                                <div class="card-body">
+                    `);
+
+                    // Chapters
+                    if (section.chapters && section.chapters.length > 0) {
+                        section.chapters.forEach((chapter) => {
+                            htmlParts.push(`<div class="chapter-block">`);
+                            htmlParts.push(
+                                `<div class="chapter-title">${chapter.DisplayTitle}</div>`
+                            );
+
+                            // Topics
+                            if (chapter.Topics && chapter.Topics.length > 0) {
+                                htmlParts.push(
+                                    `<div class="list-group list-group-flush">`
+                                );
+                                chapter.Topics.forEach((topic) => {
+                                    htmlParts.push(`
+                                        <a href="${topic.TopicId}.html" class="list-group-item list-group-item-action py-2">
+                                            ${topic.DisplayTitle}
+                                        </a>
+                                    `);
+                                });
+                                htmlParts.push(`</div>`); // End list-group
+                            }
+                            htmlParts.push(`</div>`); // End chapter-block
+                        });
+                    }
+
+                    htmlParts.push(`
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                });
+
+                // Render to DOM
+                menuContainer.innerHTML = htmlParts.join("");
+
+                // Update UI State
+                loadingEl.style.display = "none";
+                titleEl.textContent = "Menu";
+
+                // Enable Filter
+                filterInput.disabled = false;
+                initFilter();
             }
-        </script>
-        <script>
+
+            function showError() {
+                loadingEl.style.display = "none";
+                errorEl.style.display = "block";
+                titleEl.textContent = "Error";
+            }
+
+            // Callback function called by index_portable.js
             function index_callback(index) {
-                geneIndex(index);
+                // Use setTimeout to allow UI to render "Generating" text if dataset is huge
+                setTimeout(() => geneIndex(index), 10);
             }
-            title.innerHTML = "Menu - Loading Index...";
+
+            /**
+             * Client-side filter functionality
+             * Allows searching through the accordion
+             */
+            function initFilter() {
+                filterInput.addEventListener("keyup", function () {
+                    let filter = this.value.toLowerCase();
+                    let cards = document.getElementsByClassName("section-card");
+
+                    for (let card of cards) {
+                        // We check the entire text content of the card (Section + Chapters + Topics)
+                        // This is a simple broad search.
+                        let text = card.textContent || card.innerText;
+                        if (text.toLowerCase().indexOf(filter) > -1) {
+                            card.style.display = "";
+                        } else {
+                            card.style.display = "none";
+                        }
+                    }
+
+                    // If filter is cleared, ensure layout is reset
+                    if (filter === "") {
+                        // Collapse all automatically to keep clean? Or keep as is.
+                        // Bootstrap handles display:none removal correctly.
+                    }
+                });
+            }
         </script>
-        <script src="index_portable.js"></script>
-        <script>
-            title.innerHTML = "Menu";
-        </script>
+
+        <!-- Load Data Script -->
+        <!-- Added onerror handler for robustness -->
+        <script src="index_portable.js" onerror="showError()"></script>
     </body>
 </html>

@@ -28,11 +28,38 @@
         <link rel="stylesheet" href="bootstrap.min.css" />
         <script src="jquery.min.js"></script>
         <script src="bootstrap.bundle.min.js"></script>
-        <script>
-            function searchwrapper() {
-                search();
+        <style>
+            .type-badge {
+                font-size: 0.85em;
+                padding: 4px 8px;
+                border-radius: 4px;
+                background-color: #e9ecef;
+                color: #495057;
+                font-weight: 600;
+                display: inline-block;
+                min-width: 80px;
+                text-align: center;
             }
-        </script>
+            /* Highlight specific types */
+            .type-Videos {
+                background-color: #d1ecf1;
+                color: #0c5460;
+            }
+            .type-Images {
+                background-color: #fff3cd;
+                color: #856404;
+            }
+            .type-Chapters {
+                background-color: #d4edda;
+                color: #155724;
+            }
+
+            #result-count {
+                margin-top: 10px;
+                font-style: italic;
+                color: #6c757d;
+            }
+        </style>
     </head>
 
     <body>
@@ -70,357 +97,267 @@
                 </ul>
             </div>
         </nav>
+
         <br />
-        <!--Search Button call search()-->
+
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <h1 id="title">
-                        Search - Will NOT Work without JavaScript Enabled
-                    </h1>
-                    <form class="d-flex" onsubmit="return false">
+                    <h1 id="page-status">Search</h1>
+                    <!-- Form handles Enter key automatically -->
+                    <form
+                        class="d-flex"
+                        id="search-form"
+                        onsubmit="handleSearch(event)"
+                    >
                         <input
-                            class="border"
+                            class="form-control mr-2"
                             type="search"
-                            placeholder="Search"
+                            placeholder="Type keywords..."
                             aria-label="Search"
-                            id="search"
+                            id="search-input"
+                            disabled
                         />
                         <button
                             class="btn btn-primary"
                             type="submit"
-                            onclick="searchwrapper()"
+                            id="search-btn"
+                            disabled
                         >
                             Search
                         </button>
                     </form>
+                    <div id="result-count"></div>
                 </div>
             </div>
         </div>
+
         <br />
+
         <!--Search Result-->
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>TopicTitle</th>
-                                <th>ChapterTitle/RelatedTopicTitle</th>
-                                <th>SectionTitle</th>
-                            </tr>
-                        </thead>
-                        <tbody id="result"></tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 15%">Type</th>
+                                    <th style="width: 40%">Topic Title</th>
+                                    <th style="width: 25%">Related Context</th>
+                                    <th style="width: 20%">Section</th>
+                                </tr>
+                            </thead>
+                            <tbody id="result-body">
+                                <!-- Results will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Empty State Message -->
+                    <div
+                        id="no-results"
+                        class="alert alert-warning text-center"
+                        style="display: none"
+                    >
+                        No results found. Please try a different keyword.
+                    </div>
                 </div>
             </div>
         </div>
+
         <script>
-            function nullHandler(data) {
-                if (data == null) {
-                    return "";
+            // Global data storage
+            var searchData = [];
+            const inputEl = document.getElementById("search-input");
+            const btnEl = document.getElementById("search-btn");
+            const statusEl = document.getElementById("page-status");
+            const resultBody = document.getElementById("result-body");
+            const noResultsEl = document.getElementById("no-results");
+            const countEl = document.getElementById("result-count");
+
+            /**
+             * Safe string handler
+             */
+            function safeStr(str) {
+                return str ? str.toString() : "";
+            }
+
+            /**
+             * Helper to clean URLs (remove domain)
+             */
+            function cleanUrl(url) {
+                if (!url) return "";
+                return url
+                    .replace("https://www.msdmanuals.cn/", "")
+                    .replace("https://www.msdmanuals.com/", "");
+            }
+
+            /**
+             * Logic to generate the correct href based on ContentType
+             */
+            function getLinkForType(item) {
+                const type = item.ContentType;
+                const tid = safeStr(item.TopicId);
+                const url = safeStr(item.TopicUrl);
+                const vid = safeStr(item.videoId);
+
+                switch (type) {
+                    case "Chapters":
+                    case "Medical Topics":
+                        return tid + ".html";
+                    case "Clinical Calculator":
+                        return "Content/Calcdumps/" + tid + ".html";
+                    case "Tables":
+                        // Assuming TopicId is the link as per original code
+                        return tid;
+                    case "Images":
+                    case "Figures":
+                    case "3D Models":
+                        return cleanUrl(url);
+                    case "Videos":
+                        return (
+                            "https://players.brightcove.net/3850378299001/default_default/index.html?videoId=" +
+                            vid
+                        );
+                    default:
+                        return "#";
+                }
+            }
+
+            /**
+             * Logic to determine what to show in the 2nd column (Context)
+             * Returns { href: string, text: string }
+             */
+            function getRelatedContext(item) {
+                // Determine if we use Chapter or RelatedTopic info
+                // Original logic: Chapters/Topics/Calc/Tables -> ChapterId
+                // Images/Figures/3D/Video -> RelatedTopicId
+                const useRelated = [
+                    "Images",
+                    "Figures",
+                    "3D Models",
+                    "Videos",
+                ].includes(item.ContentType);
+
+                if (useRelated) {
+                    return {
+                        href: safeStr(item.RelatedTopicId) + ".html",
+                        text: safeStr(item.RelatedTopicTitle),
+                    };
                 } else {
-                    return data;
+                    return {
+                        href: safeStr(item.ChapterId) + ".html",
+                        text: safeStr(item.ChapterTitle),
+                    };
                 }
             }
 
-            // Search function
-            function search() {
-                var data = window.jsonData;
-                var searchinput = document.getElementById("search").value;
-                var searchresult = document.getElementById("result");
-                var searchresulthtml = "";
+            /**
+             * Main Search Function
+             */
+            function handleSearch(e) {
+                if (e) e.preventDefault(); // Prevent form submit reload
 
-                // For every item in data
-                for (var i = 0; i < data.length; i++) {
-                    if (data[i].ContentType == "Chapters") {
-                        if (
-                            nullHandler(data[i].Keywords)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1 ||
-                            nullHandler(data[i].ChapterTitle)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1
-                        ) {
-                            searchresulthtml += "<tr>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].TopicId) +
-                                ".html'>" +
-                                nullHandler(data[i].TopicTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].ChapterId) +
-                                ".html'>" +
-                                nullHandler(data[i].ChapterTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].SectionId) +
-                                ".html'>" +
-                                nullHandler(data[i].SectionTitle) +
-                                "</a></td>";
-                            searchresulthtml += "</tr>";
-                        }
-                    }
-                    if (data[i].ContentType == "Medical Topics") {
-                        if (
-                            nullHandler(data[i].Keywords)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1 ||
-                            nullHandler(data[i].TopicTitle)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1
-                        ) {
-                            searchresulthtml += "<tr>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].TopicId) +
-                                ".html'>" +
-                                nullHandler(data[i].TopicTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].ChapterId) +
-                                ".html'>" +
-                                nullHandler(data[i].ChapterTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].SectionId) +
-                                ".html'>" +
-                                nullHandler(data[i].SectionTitle) +
-                                "</a></td>";
-                            searchresulthtml += "</tr>";
-                        }
-                    }
-                    if (data[i].ContentType == "Clinical Calculator") {
-                        if (
-                            nullHandler(data[i].Keywords)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1 ||
-                            nullHandler(data[i].TopicTitle)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1
-                        ) {
-                            searchresulthtml += "<tr>";
-                            searchresulthtml +=
-                                "<td><a href='Content/Calcdumps/" +
-                                nullHandler(data[i].TopicId) +
-                                ".html'>" +
-                                nullHandler(data[i].TopicTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].ChapterId) +
-                                ".html'>" +
-                                nullHandler(data[i].ChapterTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].SectionId) +
-                                ".html'>" +
-                                nullHandler(data[i].SectionTitle) +
-                                "</a></td>";
-                            searchresulthtml += "</tr>";
-                        }
-                    }
-                    if (data[i].ContentType == "Tables") {
-                        if (
-                            nullHandler(data[i].Keywords)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1 ||
-                            nullHandler(data[i].TopicTitle)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1
-                        ) {
-                            searchresulthtml += "<tr>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].TopicId) +
-                                "'>" +
-                                nullHandler(data[i].TopicTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].ChapterId) +
-                                ".html'>" +
-                                nullHandler(data[i].ChapterTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].SectionId) +
-                                ".html'>" +
-                                nullHandler(data[i].SectionTitle) +
-                                "</a></td>";
-                            searchresulthtml += "</tr>";
-                        }
-                    }
-                    if (data[i].ContentType == "Images") {
-                        if (
-                            nullHandler(data[i].Keywords)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1 ||
-                            nullHandler(data[i].TopicTitle)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1
-                        ) {
-                            searchresulthtml += "<tr>";
-                            var TopicUrl = nullHandler(data[i].TopicUrl);
-                            // Remove `https://www.msdmanuals.cn/` from string
-                            TopicUrl = TopicUrl.replace(
-                                "https://www.msdmanuals.cn/",
-                                ""
-                            );
-                            // Remove `https://www.msdmanuals.com/` from string
-                            TopicUrl = TopicUrl.replace(
-                                "https://www.msdmanuals.com/",
-                                ""
-                            );
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(TopicUrl) +
-                                "'>" +
-                                nullHandler(data[i].TopicTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].RelatedTopicId) +
-                                ".html'>" +
-                                nullHandler(data[i].RelatedTopicTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].SectionId) +
-                                ".html'>" +
-                                nullHandler(data[i].SectionTitle) +
-                                "</a></td>";
-                            searchresulthtml += "</tr>";
-                        }
-                    }
-                    if (data[i].ContentType == "Figures") {
-                        if (
-                            nullHandler(data[i].Keywords)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1 ||
-                            nullHandler(data[i].TopicTitle)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1
-                        ) {
-                            searchresulthtml += "<tr>";
-                            var TopicUrl = nullHandler(data[i].TopicUrl);
-                            // Remove `https://www.msdmanuals.cn/` from string
-                            TopicUrl = TopicUrl.replace(
-                                "https://www.msdmanuals.cn/",
-                                ""
-                            );
-                            // Remove `https://www.msdmanuals.com/` from string
-                            TopicUrl = TopicUrl.replace(
-                                "https://www.msdmanuals.com/",
-                                ""
-                            );
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(TopicUrl) +
-                                "'>" +
-                                nullHandler(data[i].TopicTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].RelatedTopicId) +
-                                ".html'>" +
-                                nullHandler(data[i].RelatedTopicTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].SectionId) +
-                                ".html'>" +
-                                nullHandler(data[i].SectionTitle) +
-                                "</a></td>";
-                            searchresulthtml += "</tr>";
-                        }
-                    }
-                    if (data[i].ContentType == "3D Models") {
-                        if (
-                            nullHandler(data[i].Keywords)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1 ||
-                            nullHandler(data[i].TopicTitle)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1
-                        ) {
-                            searchresulthtml += "<tr>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].TopicUrl) +
-                                "'>" +
-                                nullHandler(data[i].TopicTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].RelatedTopicId) +
-                                ".html'>" +
-                                nullHandler(data[i].RelatedTopicTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].SectionId) +
-                                ".html'>" +
-                                nullHandler(data[i].SectionTitle) +
-                                "</a></td>";
-                            searchresulthtml += "</tr>";
-                        }
-                    }
-                    if (data[i].ContentType == "Videos") {
-                        if (
-                            nullHandler(data[i].Keywords)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1 ||
-                            nullHandler(data[i].TopicTitle)
-                                .toLowerCase()
-                                .indexOf(searchinput.toLowerCase()) != -1
-                        ) {
-                            searchresulthtml += "<tr>";
-                            searchresulthtml +=
-                                "<td><a href='https://players.brightcove.net/3850378299001/default_default/index.html?videoId=" +
-                                nullHandler(data[i].videoId) +
-                                "'>" +
-                                nullHandler(data[i].TopicTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].RelatedTopicId) +
-                                ".html'>" +
-                                nullHandler(data[i].RelatedTopicTitle) +
-                                "</a></td>";
-                            searchresulthtml +=
-                                "<td><a href='" +
-                                nullHandler(data[i].SectionId) +
-                                ".html'>" +
-                                nullHandler(data[i].SectionTitle) +
-                                "</a></td>";
-                            searchresulthtml += "</tr>";
-                        }
-                    }
+                const query = safeStr(inputEl.value).trim().toLowerCase();
+
+                if (!query) {
+                    resultBody.innerHTML = "";
+                    countEl.textContent = "";
+                    noResultsEl.style.display = "none";
+                    return;
                 }
 
-                searchresult.innerHTML = searchresulthtml;
-            }
-        </script>
-        <script>
-            var title = document.getElementById("title");
+                statusEl.textContent = "Searching...";
 
+                // Use setTimeout to allow UI to update text before heavy processing
+                setTimeout(() => {
+                    performSearch(query);
+                }, 10);
+            }
+
+            function performSearch(query) {
+                // Filter Data
+                const results = searchData.filter((item) => {
+                    const k = safeStr(item.Keywords).toLowerCase();
+                    const t = safeStr(item.TopicTitle).toLowerCase();
+                    const c = safeStr(item.ChapterTitle).toLowerCase(); // Optional: search chapter title too
+
+                    return (
+                        k.indexOf(query) !== -1 ||
+                        t.indexOf(query) !== -1 ||
+                        c.indexOf(query) !== -1
+                    );
+                });
+
+                // Render Results
+                if (results.length === 0) {
+                    resultBody.innerHTML = "";
+                    noResultsEl.style.display = "block";
+                    countEl.textContent = "0 results found";
+                } else {
+                    noResultsEl.style.display = "none";
+                    countEl.textContent = results.length + " results found";
+
+                    // Build HTML string
+                    const html = results
+                        .map((item) => {
+                            const mainLink = getLinkForType(item);
+                            const context = getRelatedContext(item);
+                            const sectionLink =
+                                safeStr(item.SectionId) + ".html";
+                            const typeClass =
+                                "type-" + item.ContentType.replace(" ", "");
+
+                            return `
+                            <tr>
+                                <td><span class="type-badge ${typeClass}">${
+                                item.ContentType
+                            }</span></td>
+                                <td><a href="${mainLink}">${safeStr(
+                                item.TopicTitle
+                            )}</a></td>
+                                <td><a href="${context.href}">${
+                                context.text
+                            }</a></td>
+                                <td><a href="${sectionLink}">${safeStr(
+                                item.SectionTitle
+                            )}</a></td>
+                            </tr>
+                        `;
+                        })
+                        .join("");
+
+                    resultBody.innerHTML = html;
+                }
+
+                statusEl.textContent = "Search";
+            }
+
+            /**
+             * Callback for JSONP
+             */
             function searchcontent_callback(content) {
-                window.jsonData = content;
+                if (Array.isArray(content)) {
+                    searchData = content;
+                    statusEl.textContent = "Search";
+                    inputEl.disabled = false;
+                    btnEl.disabled = false;
+                    inputEl.placeholder = "Type keywords...";
+                } else {
+                    statusEl.textContent = "Error: Invalid Data";
+                }
             }
         </script>
+
+        <!-- Initial Status -->
         <script>
-            title.innerHTML = "Search - Loading Index...";
+            statusEl.textContent = "Loading Index...";
         </script>
-        <script src="searchcontent_portable.js"></script>
-        <script>
-            title.innerHTML = "Search";
-        </script>
+
+        <!-- Load Data with error handling -->
+        <script
+            src="searchcontent_portable.js"
+            onerror="document.getElementById('page-status').textContent='Error loading data file'"
+        ></script>
     </body>
 </html>
