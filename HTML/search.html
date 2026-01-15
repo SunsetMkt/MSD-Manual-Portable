@@ -18,395 +18,409 @@
     Videos - https://players.brightcove.net/3850378299001/default_default/index.html?videoId=videoId
 -->
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <title>Search - MSD-Manual-Portable</title>
-    <link rel="stylesheet" href="bootstrap.min.css" />
-    <script src="jquery.min.js"></script>
-    <script src="bootstrap.bundle.min.js"></script>
-    <script>
-      function searchwrapper() {
-        search();
-      }
-    </script>
-  </head>
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <title>Search - MSD-Manual-Portable</title>
+        <link rel="stylesheet" href="bootstrap.min.css" />
+        <script src="jquery.min.js"></script>
+        <script src="bootstrap.bundle.min.js"></script>
+        <script>
+            function searchwrapper() {
+                search();
+            }
+        </script>
+    </head>
 
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="index.html">MSD-Manual-Portable</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="index.html">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="menu.html">Menu</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="search.html">Search</a>
-          </li>
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              href="https://github.com/SunsetMkt/MSD-Manual-Portable"
-              >About</a
-            >
-          </li>
-        </ul>
-      </div>
-    </nav>
-    <br />
-    <!--Search Button call search()-->
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <h1 id="title">Search - Will NOT Work without JavaScript Enabled</h1>
-          <form class="d-flex" onsubmit="return false">
-            <input
-              class="border"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-              id="search"
-            />
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="index.html">MSD-Manual-Portable</a>
             <button
-              class="btn btn-primary"
-              type="submit"
-              onclick="searchwrapper()"
+                class="navbar-toggler"
+                type="button"
+                data-toggle="collapse"
+                data-target="#navbarNav"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
             >
-              Search
+                <span class="navbar-toggler-icon"></span>
             </button>
-          </form>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="menu.html">Menu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="search.html">Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="https://github.com/SunsetMkt/MSD-Manual-Portable"
+                            >About</a
+                        >
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <br />
+        <!--Search Button call search()-->
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 id="title">
+                        Search - Will NOT Work without JavaScript Enabled
+                    </h1>
+                    <form class="d-flex" onsubmit="return false">
+                        <input
+                            class="border"
+                            type="search"
+                            placeholder="Search"
+                            aria-label="Search"
+                            id="search"
+                        />
+                        <button
+                            class="btn btn-primary"
+                            type="submit"
+                            onclick="searchwrapper()"
+                        >
+                            Search
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <br />
-    <!--Search Result-->
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>TopicTitle</th>
-                <th>ChapterTitle/RelatedTopicTitle</th>
-                <th>SectionTitle</th>
-              </tr>
-            </thead>
-            <tbody id="result"></tbody>
-          </table>
+        <br />
+        <!--Search Result-->
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>TopicTitle</th>
+                                <th>ChapterTitle/RelatedTopicTitle</th>
+                                <th>SectionTitle</th>
+                            </tr>
+                        </thead>
+                        <tbody id="result"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <script>
-      function nullHandler(data) {
-        if (data == null) {
-          return "";
-        } else {
-          return data;
-        }
-      }
+        <script>
+            function nullHandler(data) {
+                if (data == null) {
+                    return "";
+                } else {
+                    return data;
+                }
+            }
 
-      // Search function
-      function search() {
-        var data = window.jsonData;
-        var searchinput = document.getElementById("search").value;
-        var searchresult = document.getElementById("result");
-        var searchresulthtml = "";
+            // Search function
+            function search() {
+                var data = window.jsonData;
+                var searchinput = document.getElementById("search").value;
+                var searchresult = document.getElementById("result");
+                var searchresulthtml = "";
 
-        // For every item in data
-        for (var i = 0; i < data.length; i++) {
-          if (data[i].ContentType == "Chapters") {
-            if (
-              nullHandler(data[i].Keywords)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1 ||
-              nullHandler(data[i].ChapterTitle)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1
-            ) {
-              searchresulthtml += "<tr>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].TopicId) +
-                ".html'>" +
-                nullHandler(data[i].TopicTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].ChapterId) +
-                ".html'>" +
-                nullHandler(data[i].ChapterTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].SectionId) +
-                ".html'>" +
-                nullHandler(data[i].SectionTitle) +
-                "</a></td>";
-              searchresulthtml += "</tr>";
-            }
-          }
-          if (data[i].ContentType == "Medical Topics") {
-            if (
-              nullHandler(data[i].Keywords)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1 ||
-              nullHandler(data[i].TopicTitle)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1
-            ) {
-              searchresulthtml += "<tr>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].TopicId) +
-                ".html'>" +
-                nullHandler(data[i].TopicTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].ChapterId) +
-                ".html'>" +
-                nullHandler(data[i].ChapterTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].SectionId) +
-                ".html'>" +
-                nullHandler(data[i].SectionTitle) +
-                "</a></td>";
-              searchresulthtml += "</tr>";
-            }
-          }
-          if (data[i].ContentType == "Clinical Calculator") {
-            if (
-              nullHandler(data[i].Keywords)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1 ||
-              nullHandler(data[i].TopicTitle)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1
-            ) {
-              searchresulthtml += "<tr>";
-              searchresulthtml +=
-                "<td><a href='Content/Calcdumps/" +
-                nullHandler(data[i].TopicId) +
-                ".html'>" +
-                nullHandler(data[i].TopicTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].ChapterId) +
-                ".html'>" +
-                nullHandler(data[i].ChapterTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].SectionId) +
-                ".html'>" +
-                nullHandler(data[i].SectionTitle) +
-                "</a></td>";
-              searchresulthtml += "</tr>";
-            }
-          }
-          if (data[i].ContentType == "Tables") {
-            if (
-              nullHandler(data[i].Keywords)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1 ||
-              nullHandler(data[i].TopicTitle)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1
-            ) {
-              searchresulthtml += "<tr>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].TopicId) +
-                "'>" +
-                nullHandler(data[i].TopicTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].ChapterId) +
-                ".html'>" +
-                nullHandler(data[i].ChapterTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].SectionId) +
-                ".html'>" +
-                nullHandler(data[i].SectionTitle) +
-                "</a></td>";
-              searchresulthtml += "</tr>";
-            }
-          }
-          if (data[i].ContentType == "Images") {
-            if (
-              nullHandler(data[i].Keywords)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1 ||
-              nullHandler(data[i].TopicTitle)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1
-            ) {
-              searchresulthtml += "<tr>";
-              var TopicUrl = nullHandler(data[i].TopicUrl);
-              // Remove `https://www.msdmanuals.cn/` from string
-              TopicUrl = TopicUrl.replace("https://www.msdmanuals.cn/", "");
-              // Remove `https://www.msdmanuals.com/` from string
-              TopicUrl = TopicUrl.replace("https://www.msdmanuals.com/", "");
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(TopicUrl) +
-                "'>" +
-                nullHandler(data[i].TopicTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].RelatedTopicId) +
-                ".html'>" +
-                nullHandler(data[i].RelatedTopicTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].SectionId) +
-                ".html'>" +
-                nullHandler(data[i].SectionTitle) +
-                "</a></td>";
-              searchresulthtml += "</tr>";
-            }
-          }
-          if (data[i].ContentType == "Figures") {
-            if (
-              nullHandler(data[i].Keywords)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1 ||
-              nullHandler(data[i].TopicTitle)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1
-            ) {
-              searchresulthtml += "<tr>";
-              var TopicUrl = nullHandler(data[i].TopicUrl);
-              // Remove `https://www.msdmanuals.cn/` from string
-              TopicUrl = TopicUrl.replace("https://www.msdmanuals.cn/", "");
-              // Remove `https://www.msdmanuals.com/` from string
-              TopicUrl = TopicUrl.replace("https://www.msdmanuals.com/", "");
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(TopicUrl) +
-                "'>" +
-                nullHandler(data[i].TopicTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].RelatedTopicId) +
-                ".html'>" +
-                nullHandler(data[i].RelatedTopicTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].SectionId) +
-                ".html'>" +
-                nullHandler(data[i].SectionTitle) +
-                "</a></td>";
-              searchresulthtml += "</tr>";
-            }
-          }
-          if (data[i].ContentType == "3D Models") {
-            if (
-              nullHandler(data[i].Keywords)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1 ||
-              nullHandler(data[i].TopicTitle)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1
-            ) {
-              searchresulthtml += "<tr>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].TopicUrl) +
-                "'>" +
-                nullHandler(data[i].TopicTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].RelatedTopicId) +
-                ".html'>" +
-                nullHandler(data[i].RelatedTopicTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].SectionId) +
-                ".html'>" +
-                nullHandler(data[i].SectionTitle) +
-                "</a></td>";
-              searchresulthtml += "</tr>";
-            }
-          }
-          if (data[i].ContentType == "Videos") {
-            if (
-              nullHandler(data[i].Keywords)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1 ||
-              nullHandler(data[i].TopicTitle)
-                .toLowerCase()
-                .indexOf(searchinput.toLowerCase()) != -1
-            ) {
-              searchresulthtml += "<tr>";
-              searchresulthtml +=
-                "<td><a href='https://players.brightcove.net/3850378299001/default_default/index.html?videoId=" +
-                nullHandler(data[i].videoId) +
-                "'>" +
-                nullHandler(data[i].TopicTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].RelatedTopicId) +
-                ".html'>" +
-                nullHandler(data[i].RelatedTopicTitle) +
-                "</a></td>";
-              searchresulthtml +=
-                "<td><a href='" +
-                nullHandler(data[i].SectionId) +
-                ".html'>" +
-                nullHandler(data[i].SectionTitle) +
-                "</a></td>";
-              searchresulthtml += "</tr>";
-            }
-          }
-        }
+                // For every item in data
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].ContentType == "Chapters") {
+                        if (
+                            nullHandler(data[i].Keywords)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1 ||
+                            nullHandler(data[i].ChapterTitle)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1
+                        ) {
+                            searchresulthtml += "<tr>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].TopicId) +
+                                ".html'>" +
+                                nullHandler(data[i].TopicTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].ChapterId) +
+                                ".html'>" +
+                                nullHandler(data[i].ChapterTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].SectionId) +
+                                ".html'>" +
+                                nullHandler(data[i].SectionTitle) +
+                                "</a></td>";
+                            searchresulthtml += "</tr>";
+                        }
+                    }
+                    if (data[i].ContentType == "Medical Topics") {
+                        if (
+                            nullHandler(data[i].Keywords)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1 ||
+                            nullHandler(data[i].TopicTitle)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1
+                        ) {
+                            searchresulthtml += "<tr>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].TopicId) +
+                                ".html'>" +
+                                nullHandler(data[i].TopicTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].ChapterId) +
+                                ".html'>" +
+                                nullHandler(data[i].ChapterTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].SectionId) +
+                                ".html'>" +
+                                nullHandler(data[i].SectionTitle) +
+                                "</a></td>";
+                            searchresulthtml += "</tr>";
+                        }
+                    }
+                    if (data[i].ContentType == "Clinical Calculator") {
+                        if (
+                            nullHandler(data[i].Keywords)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1 ||
+                            nullHandler(data[i].TopicTitle)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1
+                        ) {
+                            searchresulthtml += "<tr>";
+                            searchresulthtml +=
+                                "<td><a href='Content/Calcdumps/" +
+                                nullHandler(data[i].TopicId) +
+                                ".html'>" +
+                                nullHandler(data[i].TopicTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].ChapterId) +
+                                ".html'>" +
+                                nullHandler(data[i].ChapterTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].SectionId) +
+                                ".html'>" +
+                                nullHandler(data[i].SectionTitle) +
+                                "</a></td>";
+                            searchresulthtml += "</tr>";
+                        }
+                    }
+                    if (data[i].ContentType == "Tables") {
+                        if (
+                            nullHandler(data[i].Keywords)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1 ||
+                            nullHandler(data[i].TopicTitle)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1
+                        ) {
+                            searchresulthtml += "<tr>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].TopicId) +
+                                "'>" +
+                                nullHandler(data[i].TopicTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].ChapterId) +
+                                ".html'>" +
+                                nullHandler(data[i].ChapterTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].SectionId) +
+                                ".html'>" +
+                                nullHandler(data[i].SectionTitle) +
+                                "</a></td>";
+                            searchresulthtml += "</tr>";
+                        }
+                    }
+                    if (data[i].ContentType == "Images") {
+                        if (
+                            nullHandler(data[i].Keywords)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1 ||
+                            nullHandler(data[i].TopicTitle)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1
+                        ) {
+                            searchresulthtml += "<tr>";
+                            var TopicUrl = nullHandler(data[i].TopicUrl);
+                            // Remove `https://www.msdmanuals.cn/` from string
+                            TopicUrl = TopicUrl.replace(
+                                "https://www.msdmanuals.cn/",
+                                ""
+                            );
+                            // Remove `https://www.msdmanuals.com/` from string
+                            TopicUrl = TopicUrl.replace(
+                                "https://www.msdmanuals.com/",
+                                ""
+                            );
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(TopicUrl) +
+                                "'>" +
+                                nullHandler(data[i].TopicTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].RelatedTopicId) +
+                                ".html'>" +
+                                nullHandler(data[i].RelatedTopicTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].SectionId) +
+                                ".html'>" +
+                                nullHandler(data[i].SectionTitle) +
+                                "</a></td>";
+                            searchresulthtml += "</tr>";
+                        }
+                    }
+                    if (data[i].ContentType == "Figures") {
+                        if (
+                            nullHandler(data[i].Keywords)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1 ||
+                            nullHandler(data[i].TopicTitle)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1
+                        ) {
+                            searchresulthtml += "<tr>";
+                            var TopicUrl = nullHandler(data[i].TopicUrl);
+                            // Remove `https://www.msdmanuals.cn/` from string
+                            TopicUrl = TopicUrl.replace(
+                                "https://www.msdmanuals.cn/",
+                                ""
+                            );
+                            // Remove `https://www.msdmanuals.com/` from string
+                            TopicUrl = TopicUrl.replace(
+                                "https://www.msdmanuals.com/",
+                                ""
+                            );
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(TopicUrl) +
+                                "'>" +
+                                nullHandler(data[i].TopicTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].RelatedTopicId) +
+                                ".html'>" +
+                                nullHandler(data[i].RelatedTopicTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].SectionId) +
+                                ".html'>" +
+                                nullHandler(data[i].SectionTitle) +
+                                "</a></td>";
+                            searchresulthtml += "</tr>";
+                        }
+                    }
+                    if (data[i].ContentType == "3D Models") {
+                        if (
+                            nullHandler(data[i].Keywords)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1 ||
+                            nullHandler(data[i].TopicTitle)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1
+                        ) {
+                            searchresulthtml += "<tr>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].TopicUrl) +
+                                "'>" +
+                                nullHandler(data[i].TopicTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].RelatedTopicId) +
+                                ".html'>" +
+                                nullHandler(data[i].RelatedTopicTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].SectionId) +
+                                ".html'>" +
+                                nullHandler(data[i].SectionTitle) +
+                                "</a></td>";
+                            searchresulthtml += "</tr>";
+                        }
+                    }
+                    if (data[i].ContentType == "Videos") {
+                        if (
+                            nullHandler(data[i].Keywords)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1 ||
+                            nullHandler(data[i].TopicTitle)
+                                .toLowerCase()
+                                .indexOf(searchinput.toLowerCase()) != -1
+                        ) {
+                            searchresulthtml += "<tr>";
+                            searchresulthtml +=
+                                "<td><a href='https://players.brightcove.net/3850378299001/default_default/index.html?videoId=" +
+                                nullHandler(data[i].videoId) +
+                                "'>" +
+                                nullHandler(data[i].TopicTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].RelatedTopicId) +
+                                ".html'>" +
+                                nullHandler(data[i].RelatedTopicTitle) +
+                                "</a></td>";
+                            searchresulthtml +=
+                                "<td><a href='" +
+                                nullHandler(data[i].SectionId) +
+                                ".html'>" +
+                                nullHandler(data[i].SectionTitle) +
+                                "</a></td>";
+                            searchresulthtml += "</tr>";
+                        }
+                    }
+                }
 
-        searchresult.innerHTML = searchresulthtml;
-      }
-    </script>
-    <script>
-      var title = document.getElementById("title");
+                searchresult.innerHTML = searchresulthtml;
+            }
+        </script>
+        <script>
+            var title = document.getElementById("title");
 
-      function searchcontent_callback(content) {
-        window.jsonData = content;
-      }
-    </script>
-    <script>
-      title.innerHTML = "Search - Loading Index...";
-    </script>
-    <script src="searchcontent_portable.js"></script>
-    <script>
-      title.innerHTML = "Search";
-    </script>
-  </body>
+            function searchcontent_callback(content) {
+                window.jsonData = content;
+            }
+        </script>
+        <script>
+            title.innerHTML = "Search - Loading Index...";
+        </script>
+        <script src="searchcontent_portable.js"></script>
+        <script>
+            title.innerHTML = "Search";
+        </script>
+    </body>
 </html>

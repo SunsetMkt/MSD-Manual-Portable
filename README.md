@@ -9,8 +9,8 @@ A method to build a portable and offline-available MSD Manual.
 ## Quick Start
 
 ```shell
-$ pip3 install -r requirements.txt
-$ python3 MSD-Manual-Portable.py
+pip3 install -r requirements.txt
+python3 MSD-Manual-Portable.py
 ```
 
 无需理会浏览器控制台提示错误和 HTTP 服务器显示的任何 404 错误。
@@ -77,8 +77,8 @@ options:
 
 我们将整个手册的内容结构定义为`Section-Chapter-Topic`，其中：
 
-- `sections.json` 记录所有`Section`的信息，其中每个`Section`的 UUID 均对应`Json`中的一个文件。
-- `{Section的UUID}.json` 按照每个`Section`分别记录其中的`Chapter-Topic`信息
+-   `sections.json` 记录所有`Section`的信息，其中每个`Section`的 UUID 均对应`Json`中的一个文件。
+-   `{Section的UUID}.json` 按照每个`Section`分别记录其中的`Chapter-Topic`信息
 
 ## 获取其他语言的资源文件
 
