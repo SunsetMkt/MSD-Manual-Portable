@@ -359,5 +359,9 @@
             src="searchcontent_portable.js"
             onerror="document.getElementById('page-status').textContent='Error loading data file'"
         ></script>
+        <script>
+            localStorage.setItem("popupClicked", "true");
+            localStorage.setItem("lastPopupClick", new Date().getTime());
+        </script>
     </body>
 </html>

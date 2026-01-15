@@ -272,5 +272,9 @@
         <!-- Load Data Script -->
         <!-- Added onerror handler for robustness -->
         <script src="index_portable.js" onerror="showError()"></script>
+        <script>
+            localStorage.setItem("popupClicked", "true");
+            localStorage.setItem("lastPopupClick", new Date().getTime());
+        </script>
     </body>
 </html>

@@ -246,5 +246,9 @@
             src="pearls_portable.js"
             onerror="document.getElementById('pearl-content').innerHTML='Error loading data file'"
         ></script>
+        <script>
+            localStorage.setItem("popupClicked", "true");
+            localStorage.setItem("lastPopupClick", new Date().getTime());
+        </script>
     </body>
 </html>
