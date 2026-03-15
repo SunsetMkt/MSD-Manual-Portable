@@ -284,21 +284,21 @@ def main():
 
     # 2. Download
     # Check if we need to download: if ZIP missing AND index.html missing inside target dir
-    need_download = not zip_path.exists() and not (unzipped_dir / "index.html").exists()
+    need_download = not (unzipped_dir / "index.html").exists()
 
     if need_download:
-        if not download_file(download_url, zip_path):
-            print("Critical Error: Download failed.")
-            sys.exit(1)
-    else:
-        print("Data files found. Skipping download.")
+        if not zip_path.exists():
+            if not download_file(download_url, zip_path):
+                print("Critical Error: Download failed.")
+                sys.exit(1)
+        else:
+            print("ZIP file already exists. Skipping download.")
 
-    # Download images zip if not already present
-    if not images_zip_path.exists():
-        if not download_file(images_download_url, images_zip_path):
-            print("Warning: Images download failed. Continuing without images.")
-    else:
-        print("Images files found. Skipping images download.")
+        if not images_zip_path.exists():
+            if not download_file(images_download_url, images_zip_path):
+                print("Warning: Images download failed. Continuing without images.")
+        else:
+            print("Images ZIP file already exists. Skipping images download.")
 
     # 3. Extract and Build
     if not (unzipped_dir / "index.html").exists():
